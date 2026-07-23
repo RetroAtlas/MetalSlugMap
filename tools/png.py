@@ -1,8 +1,4 @@
-"""Minimal RGBA PNG writer (unfiltered, zlib). No third-party dependencies.
-
-Kept deliberately tiny; when generated art starts being committed it will be
-post-processed with oxipng the way the OddworldMap builder does.
-"""
+"""Minimal RGBA PNG writer (unfiltered, zlib). No third-party dependencies."""
 import struct
 import zlib
 from pathlib import Path

@@ -21,5 +21,6 @@ Guidance for AI agents working in this repo. Read [README.md](README.md) first f
 - One concern per commit; split bundled diffs before committing.
 - A user-facing or behaviour change ships its docs in the same commit — update README.md / this file as part of the same concern, not a follow-up.
 - Prose files (README, docs, this file) are never manually line-wrapped — let lines run long.
+- Code comments — default to none. A comment earns its place only by recording a durable *why* the code can't show: an invariant, a constraint, a non-obvious trade-off. Keep them generic enough that a routine change doesn't force a comment edit — put a per-item note *inline on the item*, never in a doc-comment that re-describes a set's members (that rots the moment you add one). Don't name consumers or other modules ("used by X", "the way the sibling project does"); don't narrate history ("was previously…"); don't restate a constant's value or units. Comment footprint matches code footprint. An absent comment never goes stale.
 - No game owns unsuffixed defaults: everything game-specific carries its prefix (`msx`, later `ms1`/`ms2`) in files, identifiers and paths. Do not reintroduce unsuffixed names for Metal Slug X just because it came first.
 - Tooling is dependency-free Python 3 (standard library only); `tools/png.py` is a minimal writer rather than a Pillow dependency.

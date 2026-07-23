@@ -1,8 +1,7 @@
 """Read a raw PS1 disc image (.bin, 2352-byte sectors) as an ISO9660 filesystem.
 
-Game-agnostic: the same reader served the OddworldMap project. Metal Slug X is
-a standard Mode 2 ISO with a flat set of top-level files (X*.BIN missions, the
-executable, streamed media, sound banks).
+Metal Slug X is a standard Mode 2 ISO with a flat set of top-level files
+(X*.BIN missions, the executable, streamed media, sound banks).
 """
 import struct
 
