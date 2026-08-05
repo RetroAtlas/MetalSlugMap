@@ -5,16 +5,20 @@ Guidance for AI agents working in this repo. Read [README.md](README.md) first f
 ## Where the data lives (Metal Slug X, NTSC-U, SLUS-012.12)
 
 - Standard ISO9660 disc, raw 2352-byte Mode 2 sectors; `tools/disc.py` reads it with no game-specific logic.
-- Missions are `X<n>.BIN` at the disc root: `X1`, `X3`, `X4` are missions; `X21/X22/X23`, `X51/X52/X53`, `X61/X62/X63` are the sub-stages of multi-part missions. `X09.BIN` yields no TIMs (different/compressed — unexamined). Each mission file is `[TIM texture pages][large structured tail]`.
-- `X801.BIN` (30 MB) is **streamed media, not art** — starts with an audio sync header, entropy alternates ~0.5 and ~7.9 bits/byte across it (interleaved XA-ADPCM and/or MDEC video). Do not mistake it for a sprite bank.
+- `X<n>.BIN` is a mission's **base artwork**, nothing else: a chain of TIM records covering 99% of the file. `X1`, `X3`, `X4` are missions; `X21/X22/X23`, `X51/X52/X53`, `X61/X62/X63` are sub-stages of multi-part missions.
+- `X<n>_<nn>.BIN` are the per-mission section files, 150 of them. Most (124) are more TIM artwork; 26 carry data. Their first bytes identify the kind: `22 03 00 00` a tile list, `23 00 00 00` and `00 00 55 00` unidentified tables, `70 51 45 53` (`pQES`) sequence data, and `27 bd ff d8`-style MIPS prologues mark **code overlays** (`X3_0801`, `X61_000`) — the game streams executable code per section, so behaviour is not all in the main executable.
+- `X09.BIN` and `X801.BIN` are **streamed media, not art** — both start with an audio sync header, entropy alternating ~0.5 and ~7.9 bits/byte (interleaved XA-ADPCM and/or MDEC video). Do not mistake them for sprite banks.
 - `SLUS_012.12` is the game executable (622 KB MIPS) — the only structural ground truth, since no decompilation of this port exists (unlike Oddworld's alive_reversing).
 
 ## Format gotchas (established so far)
 
-- Stage art is **raw PS1 TIM** at the head of each mission file — 256x256 4-bit pages, each carrying a bank of 6-16 CLUTs (palettes) chosen per tile at draw time. No custom compression. `tools/tim.py` decodes 4/8/16-bit TIMs (RGB5551, `0x0000` = transparent).
-- Because palette is per-tile (selected by the tilemap, not stored with the page), rendering a whole page with a single CLUT gives correct shapes but wrong colours for most tiles — expect a colour cast until the tilemap is decoded. This is not a bug.
-- The mission-file tail (270-410 KB, entropy ~4.0 bits/byte) is structured binary: the tilemap that lays tiles into the scrolling stage, plus object/spawn tables. Not encrypted, not high-entropy-packed — decodable with effort. Its format is **not yet reversed**; that is the next milestone.
-- Multi-part missions share a tail structure across their sub-stage files (`X51/X52/X53`) — diffing sub-stages of one mission is the fastest way into the layout format.
+- Artwork is **raw PS1 TIM**, no custom compression, and each record carries its own VRAM destination — a mission's art is reconstructed by replaying those uploads into a 1024x512 halfword VRAM (`tools/vram.py`), which is the state everything else addresses.
+- **The TIM magic word is optional.** Only the first record in a file tends to carry `10 00 00 00`; the rest begin at the flag word. A scanner that requires the magic silently stops after one record — this hid 13 of X1.BIN's 17 pages at first. Validate records by their block lengths (`12 + w*h*2 == bnum`) instead.
+- Pages are 256x256 4-bit **atlases**, not finished pictures: a page rendered straight from its TIM looks like scrambled fragments, and that is correct.
+- A page's tiles each want a different palette, so a page carries a bank of 6-16 CLUTs and the assignment lives in a **tile list** (`tools/tilelist.py`, rendered by `tools/render_pages.py`): 8-byte records, 256 per page, that repaint the page tile by tile through the right CLUT. Destination equals source in raster order — verified 1024/1024 records — so a tile list composes *pages*, not levels. It is the only way to get true colours; a raw TIM read gives shapes under one palette's cast.
+- **VRAM is time-dependent.** Section files upload over each other during play, so loading a mission's whole file set at once corrupts pages. A section's tile list can reference palettes uploaded by a *sibling* section (`X1_00`'s first page needs `X1_081`'s CLUTs at VRAM y 496), and which files are resident together is not yet known — pass art files explicitly with `--art` until it is.
+- The **stage layout is still unfound**: no tilemap that arranges pages into a scrolling level has turned up yet. The candidates are the unidentified `23 00 00 00` / `00 00 55 00` tables, the region of a tile-list file past its records (X1_00's records stop at 1024 of 9378, and the remainder starts with a `23 00 00 00` header), and the code overlays. That is the next milestone.
+- Multi-part missions share structure across their sub-stage files (`X51/X52/X53`) — diffing sub-stages of one mission is the fastest way into an unknown table.
 
 ## Conventions (inherited from the sibling project)
 
