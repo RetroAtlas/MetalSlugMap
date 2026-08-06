@@ -31,7 +31,7 @@ python3 tools/build_map.py --disc "/path/to/Metal Slug X.bin"
 python3 -m http.server 8479 -d public      # then open http://localhost:8479
 ```
 
-That currently yields **128 pieces across 8 missions**. Pick a mission, then a section, then a piece from the list — or pan and zoom the whole section.
+That currently yields **128 pieces across 8 missions**. Pick a mission, then a section: the playfield pieces are laid end to end as one continuous stage, with the parallax layers stacked beneath. Pick a piece from the list to zoom to it, or pan and zoom freely.
 
 `--disc` can be omitted if `$METAL_SLUG_DISC` points at the image. Output lands in `out/` (git-ignored).
 
@@ -43,7 +43,7 @@ The map is being built as a **hybrid**, so there is something usable at every st
 2. **Palette resolution** — done: tile lists give every tile its true colours.
 3. **Stage layout** — done: tilemaps place tiles into stage sections, and each section renders end to end.
 4. **Viewer** — first cut: browse every extracted piece by mission and section, pan and zoom. Search, permalinks and annotations are still to come from the Oddworld Map architecture.
-5. **Section ordering** — open: how a mission's sections join into one scrolling level, and the scroll extents. See [CLAUDE.md](CLAUDE.md) for the remaining unidentified tables; note the game also streams MIPS **code overlays** per section, so some of this may be built by code rather than described by data.
+5. **Section ordering** — partly done: within a section, playfield pieces run left to right in file order and now render as one continuous stage. Which section files a mission plays, and their scroll extents, are still open. See [CLAUDE.md](CLAUDE.md) for the remaining unidentified tables; note the game also streams MIPS **code overlays** per section, so some of this may be built by code rather than described by data.
 6. **Spawn tables** — where POWs, items, hidden objects and branch triggers live. This is the data that makes the map worth having, and the least documented.
 
 Unlike Oddworld — where a community decompilation ([alive_reversing](https://github.com/AliveTeam/alive_reversing)) handed us every structure — Metal Slug X has no such reference; the only ground truth is the disc and the game executable.

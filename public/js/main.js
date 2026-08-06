@@ -58,18 +58,22 @@ function selectSection(s, btn) {
   [...$("sectionBtns").children].forEach((b) => b.classList.remove("on"));
   btn?.classList.add("on");
 
-  let y = 0;
-  layout = s.pieces.map((p) => {
-    const at = { piece: p, x: 0, y };
+  // strip pieces form the continuous playfield; the rest stack beneath it
+  const strip = s.pieces.filter((p) => p.strip);
+  const rest = s.pieces.filter((p) => !p.strip);
+  layout = strip.map((p) => ({ piece: p, x: p.x, y: 0 }));
+  let y = (s.playfield_h || 0) + GAP * 2;
+  for (const p of rest) {
+    layout.push({ piece: p, x: 0, y });
     y += p.h + GAP;
-    return at;
-  });
+  }
 
   const list = $("pieceList");
   list.innerHTML = "";
   layout.forEach((at, i) => {
     const b = document.createElement("button");
-    b.innerHTML = `${i + 1}. <span class="dim">${at.piece.tiles_w}×${at.piece.tiles_h} tiles · ${at.piece.w}×${at.piece.h}px</span>`;
+    const tag = at.piece.strip ? "" : " · layer";
+    b.innerHTML = `${i + 1}. <span class="dim">${at.piece.tiles_w}×${at.piece.tiles_h} tiles · ${at.piece.w}×${at.piece.h}px${tag}</span>`;
     b.onclick = () => {
       [...list.children].forEach((x) => x.classList.remove("on"));
       b.classList.add("on");
@@ -85,10 +89,10 @@ function selectSection(s, btn) {
 function fit() {
   if (!layout.length) return;
   if (!cv.clientWidth || !cv.clientHeight) { requestAnimationFrame(fit); return; }
-  const w = Math.max(...layout.map((a) => a.piece.w));
-  const h = layout.at(-1).y + layout.at(-1).piece.h;
+  const w = Math.max(...layout.map((a) => a.x + a.piece.w));
+  const h = Math.max(...layout.map((a) => a.y + a.piece.h));
   cam.z = Math.min(cv.clientWidth / (w + 60), cv.clientHeight / (h + 60), 2);
-  cam.x = (w - cv.clientWidth / cam.z) / 2;
+  cam.x = -30;
   cam.y = -30;
   draw();
 }

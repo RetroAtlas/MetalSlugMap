@@ -101,7 +101,12 @@ def main():
             ps = pieces(raw)
             if not ps:
                 continue
-            sec_entry = {"file": sec, "pieces": []}
+            # the playfield is the tallest piece height; those pieces run left to
+            # right in file order, so they lay out as one strip and the rest
+            # (parallax layers, set dressing) stack under it
+            playfield = max(p["h"] for p in ps)
+            sec_entry = {"file": sec, "playfield_h": playfield * TILE, "pieces": []}
+            strip_x = 0
             for i, p in enumerate(ps):
                 vram = stage_vram(index, p["tiles"], prefer=[sec, base] + sections)
                 img, W, H, drawn = render(vram, p)
@@ -109,8 +114,12 @@ def main():
                     continue
                 rel = f"pieces/msx/{sec[:-4].lower()}_{i:02d}.png"
                 write_png(out / rel, W, H, bytes(img), keep_alpha=True)
+                strip = p["h"] == playfield
                 sec_entry["pieces"].append({"png": rel, "w": W, "h": H,
-                                            "tiles_w": p["w"], "tiles_h": p["h"]})
+                                            "tiles_w": p["w"], "tiles_h": p["h"],
+                                            "strip": strip, "x": strip_x if strip else 0})
+                if strip:
+                    strip_x += W
             if sec_entry["pieces"]:
                 entry["sections"].append(sec_entry)
                 print(f"  {sec}: {len(sec_entry['pieces'])} pieces")
