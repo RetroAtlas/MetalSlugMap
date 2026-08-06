@@ -33,7 +33,7 @@ python3 tools/build_map.py --disc "/path/to/Metal Slug X.bin"
 python3 -m http.server 8479 -d public      # then open http://localhost:8479
 ```
 
-That currently yields **219 stage pieces and 16 animated objects across all 12 missions**. Pieces of the same height are one layer of the stage and lay out left to right, butted together where their edges actually match and separated by a marked break where they do not.
+That currently yields **219 stage pieces and 16 animated objects across all 12 missions**. Pick a mission, then a section: pieces of the same height are one layer of the stage and lay out left to right, butted together where their edges actually match and separated by a marked break where they do not. Hover any piece to inspect it, click to pin its details, and press `?` for the shortcuts. Search covers sections, pieces and objects; the URL hash carries the current view, so a link reopens exactly what you were looking at.
 
 `--disc` can be omitted if `$METAL_SLUG_DISC` points at the image. `tools/render_map.py` writes single sections to `out/` (git-ignored) when you want the PNGs on their own.
 
@@ -44,7 +44,7 @@ The map is being built as a **hybrid**, so there is something usable at every st
 1. **Art extraction** — done: texture pages come off the disc as PNG.
 2. **Palette resolution** — done: tile lists give every tile its true colours.
 3. **Stage layout** — done: tilemaps place tiles into stage sections, and each section renders end to end.
-4. **Viewer** — browse by mission and section, pan and zoom, jump to a piece, search sections, and share a view by URL. Object search and annotations wait on the spawn tables.
+4. **Viewer** — browse by mission and section, pan and zoom, hover to inspect, click for details, toggle layers and overlays, export a view, search across sections, pieces and objects, and share any view by URL.
 5. **Streaming order** — done: a section's number is a path through the stage, so sorting those numbers gives the order the game loads them, and each piece is rendered against the memory state where its tiles join. This is what took the artwork from plausible-looking mosaics to the real stages.
 6. **Piece placement** — open. The stage is a library of tilemap chunks and their arrangement is not in the section files, so the builder only joins two pieces where their facing edges actually match and marks the joins it cannot make. Runs that do join come out as real strips of stage.
 7. **Spawn tables** — open, and the least documented. POWs, items, hidden objects and branch triggers are not in the stage files; `MISS<nn>.BIN` turned out to be Combat School rather than the main missions. See [CLAUDE.md](CLAUDE.md) for what has been ruled out and which files are still worth opening.
@@ -65,7 +65,7 @@ Unlike Oddworld — where a community decompilation ([alive_reversing](https://g
 - `tools/render.py` — draws a piece, and scores how well it came out so the right memory state can be chosen.
 - `tools/render_map.py` — CLI that renders one section's pieces.
 - `tools/build_map.py` — CLI that renders every piece in the game and emits the viewer's data.
-- `public/` — the viewer: `index.html`, `css/main.css`, `js/main.js`, plus the generated `map_data_msx.json` and `pieces/msx/`.
+- `public/` — the viewer: `index.html`, `css/main.css`, the ES modules under `js/`, plus the generated `map_data_msx.json` and `pieces/msx/`.
 
 ## Naming
 

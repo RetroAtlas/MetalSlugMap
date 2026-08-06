@@ -2,32 +2,89 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
     <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#14161a" />
     <title>Metal Slug Map — stages extracted from the PS1 disc</title>
+    <meta
+      name="description"
+      content="Interactive map of Metal Slug X on PlayStation. Every stage piece, layer and animated object, read straight off the game disc — pan, zoom, search."
+    />
     <link rel="stylesheet" href="css/main.css" />
+    <link rel="preload" href="map_data_msx.json" as="fetch" crossorigin />
   </head>
   <body>
+    <div id="scrim"></div>
     <div id="sidebar">
       <h1>METAL SLUG MAP</h1>
       <div class="muted" id="gameName"></div>
+
       <h2>Search</h2>
-      <div id="searchBox"><input id="searchInput" type="search" placeholder="mission, section, layer…" autocomplete="off" /></div>
+      <div id="searchBox">
+        <input
+          id="searchInput"
+          type="search"
+          placeholder="mission, section, object, 20×16…"
+          autocomplete="off"
+        />
+      </div>
+      <div id="scopeBar"></div>
       <div id="searchResults"></div>
+
       <h2>Mission</h2>
       <div class="btnrow" id="missionBtns"></div>
       <h2>Section</h2>
       <div class="btnrow" id="sectionBtns"></div>
-      <h2>Pieces</h2>
+
+      <h2>Display</h2>
+      <div id="toggles"></div>
+      <button id="exportBtn" title="save the current view as an image">Export view as PNG</button>
+
+      <h2>Stage pieces</h2>
       <div id="pieceList"></div>
+      <h2 id="objectHead" hidden>Animated objects</h2>
+      <div id="objectList"></div>
+
+      <div id="sbFooter">
+        <button id="aboutBtn" type="button" class="linkbtn">About this map</button> ·
+        <button id="helpBtn" type="button" class="linkbtn">Shortcuts</button>
+      </div>
     </div>
+
     <div id="main">
       <noscript><div id="noscript">This interactive map requires JavaScript.</div></noscript>
       <canvas id="cv"></canvas>
-      <button id="menuBtn" aria-label="Toggle menu">☰</button>
-      <div id="help">drag = pan · wheel = zoom</div>
+      <button id="menuBtn" aria-label="Toggle menu" title="Toggle menu">☰</button>
+      <button id="copyLinkBtn" aria-label="Copy link to this view" title="Copy link to this view">
+        ⧉
+      </button>
+      <div id="placePanel" hidden aria-live="polite"></div>
+      <div id="tip" hidden></div>
+      <div id="help">drag = pan · wheel = zoom · hover = inspect · ? = shortcuts</div>
       <div id="hud"></div>
+      <div id="toast" hidden></div>
     </div>
+
+    <div class="overlay" id="shortcutsOverlay">
+      <aside class="dialog" role="dialog" aria-modal="true" aria-labelledby="shortcutsTitle">
+        <div class="dlg-head">
+          <h2 id="shortcutsTitle">Keyboard shortcuts</h2>
+          <button id="shortcutsClose" class="closebtn" aria-label="Close">×</button>
+        </div>
+        <div class="dlg-body" id="shortcutsBody"></div>
+      </aside>
+    </div>
+
+    <div class="overlay" id="aboutOverlay">
+      <aside class="dialog" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
+        <div class="dlg-head">
+          <h2 id="aboutTitle">About this map</h2>
+          <button id="aboutClose" class="closebtn" aria-label="Close">×</button>
+        </div>
+        <div class="dlg-body" id="aboutBody"></div>
+      </aside>
+    </div>
+
     <script type="module" src="js/main.js"></script>
   </body>
 </html>
