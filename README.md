@@ -17,8 +17,10 @@ Those pages are 4-bit **atlases** whose tiles each want a different palette, so 
 
 ```bash
 python3 tools/render_map.py --disc "/path/to/Metal Slug X.bin" --section X1_00.BIN
-python3 tools/render_map.py --disc "/path/to/Metal Slug X.bin" --section X3_00.BIN
+python3 tools/render_map.py --disc "/path/to/Metal Slug X.bin" --section X23_00.BIN
 ```
+
+Which artwork a tilemap means is the hard part, because sections stream art over each other as a mission plays and nothing on the disc records what was resident when. The tools replay each mission in its load order and pick, for every piece, the point where its tiles join most smoothly — tiles cut from one picture have no seams, so the state that renders a piece cleanly is the state it was drawn under. Every piece reports the file it settled on.
 
 `tools/render_pages.py` renders the underlying pages themselves, in true colour, when you want the raw material rather than the assembled stage.
 
@@ -43,7 +45,7 @@ The map is being built as a **hybrid**, so there is something usable at every st
 2. **Palette resolution** — done: tile lists give every tile its true colours.
 3. **Stage layout** — done: tilemaps place tiles into stage sections, and each section renders end to end.
 4. **Viewer** — browse by mission and section, pan and zoom, jump to a piece, search sections, and share a view by URL. Object search and annotations wait on the spawn tables.
-5. **Section ordering** — partly done: within a section, playfield pieces run left to right in file order and now render as one continuous stage. Which section files a mission plays, and their scroll extents, are still open. See [CLAUDE.md](CLAUDE.md) for the remaining unidentified tables; note the game also streams MIPS **code overlays** per section, so some of this may be built by code rather than described by data.
+5. **Streaming order** — done: a section's number is a path through the stage, so sorting those numbers gives the order the game loads them, and each piece is rendered against the memory state where its tiles join. This is what took the artwork from plausible-looking mosaics to the real stages.
 6. **Spawn tables** — where POWs, items, hidden objects and branch triggers live. This is the data that makes the map worth having, and the least documented: the leads point at `MISS<nn>.BIN`, which are MIPS overlays, so this milestone likely means disassembling mission code rather than reading a table.
 
 Unlike Oddworld — where a community decompilation ([alive_reversing](https://github.com/AliveTeam/alive_reversing)) handed us every structure — Metal Slug X has no such reference; the only ground truth is the disc and the game executable.
@@ -58,8 +60,9 @@ Unlike Oddworld — where a community decompilation ([alive_reversing](https://g
 - `tools/tilelist.py` — decodes the tile list: each tile's source page, position and palette.
 - `tools/tilemap.py` — decodes the stage tilemap: a grid of tile indices.
 - `tools/render_pages.py` — CLI that renders pages in their true colours.
-- `tools/section.py` — walks a section file's chunk chain and stages video memory per tile list.
-- `tools/render_map.py` — CLI that renders an assembled stage section.
+- `tools/section.py` — finds a file's tile lists and tilemaps, and replays a mission's video memory in load order.
+- `tools/render.py` — draws a piece, and scores how well it came out so the right memory state can be chosen.
+- `tools/render_map.py` — CLI that renders one section's pieces.
 - `tools/build_map.py` — CLI that renders every piece in the game and emits the viewer's data.
 - `public/` — the viewer: `index.html`, `css/main.css`, `js/main.js`, plus the generated `map_data_msx.json` and `pieces/msx/`.
 

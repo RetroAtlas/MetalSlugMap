@@ -54,22 +54,43 @@ def tim_records(data):
 class Vram:
     def __init__(self):
         self.buf = bytearray(VRAM_W * VRAM_H * 2)
+        self.written = bytearray(VRAM_W * VRAM_H)
+
+    def copy(self):
+        other = Vram()
+        other.buf[:] = self.buf
+        other.written[:] = self.written
+        return other
 
     def blit(self, x, y, w, h, blob):
         for row in range(h):
             if y + row >= VRAM_H:
                 break
-            off = ((y + row) * VRAM_W + x) * 2
-            self.buf[off:off + w * 2] = blob[row * w * 2:(row + 1) * w * 2]
+            start = (y + row) * VRAM_W + x
+            self.buf[start * 2:(start + w) * 2] = blob[row * w * 2:(row + 1) * w * 2]
+            self.written[start:start + w] = b"\1" * w
+
+    def blank(self, x, y, w, h):
+        """True when nothing has uploaded to this rectangle yet."""
+        for row in range(h):
+            if y + row >= VRAM_H:
+                break
+            start = (y + row) * VRAM_W + x
+            if any(self.written[start:start + w]):
+                return False
+        return True
+
+    def upload(self, record):
+        self.blit(record["x"], record["y"], record["w"], record["h"], record["pixels"])
+        if record["clut"]:
+            cx, cy, cw, ch, blob = record["clut"]
+            self.blit(cx, cy, cw, ch, blob)
 
     def load(self, data):
         """Replay every TIM upload in `data`; returns the records applied."""
         rs = tim_records(data)
         for r in rs:
-            self.blit(r["x"], r["y"], r["w"], r["h"], r["pixels"])
-            if r["clut"]:
-                cx, cy, cw, ch, blob = r["clut"]
-                self.blit(cx, cy, cw, ch, blob)
+            self.upload(r)
         return rs
 
     def halfword(self, x, y):
