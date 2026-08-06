@@ -13,11 +13,14 @@ python3 tools/extract_art.py --disc "/path/to/Metal Slug X.bin"          # all m
 python3 tools/extract_art.py --disc "/path/to/Metal Slug X.bin" --file X1.BIN
 ```
 
-Those pages are 4-bit **atlases** whose tiles each want a different palette, so a raw page looks like scrambled fragments under one palette's colour cast. `tools/render_pages.py` fixes both: it rebuilds the game's video memory from a mission's art, then follows a section file's **tile list** — 8-byte records that repaint a page tile by tile through the correct palette — so pages come out in their true colours:
+Those pages are 4-bit **atlases** whose tiles each want a different palette, so a raw page looks like scrambled fragments under one palette's colour cast. Two more structures put them back together: a **tile list** defining each tile (its page, position and palette) and a **tilemap** placing those tiles into a piece of stage. `tools/render_map.py` follows both and draws the result:
 
 ```bash
-python3 tools/render_pages.py --disc "/path/to/Metal Slug X.bin" --section X1_00.BIN
+python3 tools/render_map.py --disc "/path/to/Metal Slug X.bin" --section X1_00.BIN
+python3 tools/render_map.py --disc "/path/to/Metal Slug X.bin" --section X3_00.BIN
 ```
+
+`tools/render_pages.py` renders the underlying pages themselves, in true colour, when you want the raw material rather than the assembled stage.
 
 `--disc` can be omitted if `$METAL_SLUG_DISC` points at the image. Output lands in `out/` (git-ignored).
 
@@ -27,9 +30,10 @@ The map is being built as a **hybrid**, so there is something usable at every st
 
 1. **Art extraction** — done: texture pages come off the disc as PNG.
 2. **Palette resolution** — done: tile lists give every tile its true colours.
-3. **Stage layout** — open: no tilemap arranging pages into a scrolling level has turned up yet. The leads are catalogued in [CLAUDE.md](CLAUDE.md); note the game also streams MIPS **code overlays** per section, so some layout may be built by code rather than described by data.
-4. **Spawn tables** — where POWs, items, hidden objects and branch triggers live, keyed to scroll position. This is the data that makes the map worth having, and the least documented.
-5. **Viewer** — a data-driven map (each mission is one very wide scrolling stage) with search, permalinks and annotations, reusing the Oddworld Map architecture.
+3. **Stage layout** — done: tilemaps place tiles into stage sections, and each section renders end to end.
+4. **Section ordering** — open: how a mission's sections join into one scrolling level, and the scroll extents. See [CLAUDE.md](CLAUDE.md) for the remaining unidentified tables; note the game also streams MIPS **code overlays** per section, so some of this may be built by code rather than described by data.
+5. **Spawn tables** — where POWs, items, hidden objects and branch triggers live. This is the data that makes the map worth having, and the least documented.
+6. **Viewer** — a data-driven map with search, permalinks and annotations, reusing the Oddworld Map architecture.
 
 Unlike Oddworld — where a community decompilation ([alive_reversing](https://github.com/AliveTeam/alive_reversing)) handed us every structure — Metal Slug X has no such reference; the only ground truth is the disc and the game executable.
 
@@ -40,8 +44,10 @@ Unlike Oddworld — where a community decompilation ([alive_reversing](https://g
 - `tools/png.py` — dependency-free RGBA PNG writer.
 - `tools/extract_art.py` — CLI that lifts mission texture pages to PNG.
 - `tools/vram.py` — PS1 video-memory model: replays TIM uploads, reads texels through a CLUT.
-- `tools/tilelist.py` — decodes the 8-byte tile-list records that assign each tile its palette.
+- `tools/tilelist.py` — decodes the tile list: each tile's source page, position and palette.
+- `tools/tilemap.py` — decodes the stage tilemap: a grid of tile indices.
 - `tools/render_pages.py` — CLI that renders pages in their true colours.
+- `tools/render_map.py` — CLI that renders an assembled stage section.
 
 ## Naming
 
