@@ -31,7 +31,7 @@ python3 tools/build_map.py --disc "/path/to/Metal Slug X.bin"
 python3 -m http.server 8479 -d public      # then open http://localhost:8479
 ```
 
-That currently yields **128 pieces across 8 missions**. Pick a mission, then a section: the playfield pieces are laid end to end as one continuous stage, with the parallax layers stacked beneath. Pick a piece from the list to zoom to it, or pan and zoom freely.
+That currently yields **277 pieces across all 12 missions**. Pick a mission, then a section: the playfield pieces are laid end to end as one continuous stage, with the parallax layers stacked beneath. Pick a piece from the list to zoom to it, or pan and zoom freely.
 
 `--disc` can be omitted if `$METAL_SLUG_DISC` points at the image. Output lands in `out/` (git-ignored).
 

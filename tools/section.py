@@ -24,29 +24,49 @@ TILEMAP = 0x23
 PAGE_W, PAGE_H = 64, 256
 
 
+def _valid_tilelist(data, p, count):
+    """Records place 16x16 tiles, so both destinations are multiples of 16."""
+    if not count or p + 8 + count * 8 > len(data):
+        return False
+    for i in range(0, min(count, 8)):
+        o = p + 8 + i * 8
+        if data[o] % 16 or data[o + 1] % 16 or struct.unpack_from("<H", data, o + 4)[0]:
+            return False
+    return True
+
+
+def _valid_tilemap(data, p):
+    if data[p + 6] != 16 or data[p + 7] != 16:
+        return False
+    w, h = data[p + 4], data[p + 5]
+    if not (w and h) or p + 8 + w * h * 2 > len(data):
+        return False
+    cells = struct.unpack_from(f"<{w * h}H", data, p + 8)
+    return max(cells) < 4096
+
+
 def chunks(data):
-    """Yield ('tilelist'|'tilemap', offset, info) until the chain stops."""
+    """Yield ('tilelist'|'tilemap', offset, info) for every chunk in the file.
+
+    Chunks also sit after a file's leading TIM artwork, so the whole file is
+    scanned rather than walked from the start; accepting a chunk skips its
+    payload, which is what stops tile data from matching as a chunk itself.
+    """
     p = 0
     while p + 8 <= len(data):
         kind = struct.unpack_from("<I", data, p)[0]
         if kind == TILELIST:
             count = struct.unpack_from("<H", data, p + 4)[0]
-            size = 8 + count * 8
-            if not count or p + size > len(data):
-                return
-            yield "tilelist", p, count
-        elif kind == TILEMAP and data[p + 6] == 16 and data[p + 7] == 16:
+            if _valid_tilelist(data, p, count):
+                yield "tilelist", p, count
+                p += 8 + count * 8
+                continue
+        elif kind == TILEMAP and _valid_tilemap(data, p):
             w, h = data[p + 4], data[p + 5]
-            size = 8 + w * h * 2
-            if not (w and h) or p + size > len(data):
-                return
             yield "tilemap", p, (w, h)
-        elif data[p:p + 2] == b"\x00\x00":
-            p += 2
+            p += 8 + w * h * 2
             continue
-        else:
-            return
-        p += size
+        p += 2
 
 
 def tile_list(data, offset, count):
@@ -61,16 +81,31 @@ def tile_list(data, offset, count):
 
 
 def pieces(data):
-    """Return [(tilemap w, h, cells, tile list)] for every tilemap in the file."""
-    out = []
-    current = None
-    for kind, off, info in chunks(data):
+    """Return a piece per tilemap, paired with the tile list its indices mean.
+
+    A tilemap usually follows its list, but some files put every tilemap first
+    and the list after them, so a map with no list before it takes the next one.
+    A file with no list at all yields nothing — its indices belong to a list
+    that lives somewhere else.
+    """
+    found = list(chunks(data))
+    lists = {}
+    for kind, off, info in found:
         if kind == "tilelist":
-            current = tile_list(data, off, info)
-        elif current:
-            w, h = info
-            cells = struct.unpack_from(f"<{w * h}H", data, off + 8)
-            out.append(dict(offset=off, w=w, h=h, cells=cells, tiles=current))
+            lists[off] = tile_list(data, off, info)
+    if not lists:
+        return []
+    offsets = sorted(lists)
+
+    out = []
+    for kind, off, info in found:
+        if kind != "tilemap":
+            continue
+        before = [o for o in offsets if o < off]
+        tiles = lists[before[-1] if before else offsets[0]]
+        w, h = info
+        cells = struct.unpack_from(f"<{w * h}H", data, off + 8)
+        out.append(dict(offset=off, w=w, h=h, cells=cells, tiles=tiles))
     return out
 
 
