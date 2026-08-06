@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <title>Metal Slug Map — stages extracted from the PS1 disc</title>
+    <link rel="stylesheet" href="css/main.css" />
+  </head>
+  <body>
+    <div id="sidebar">
+      <h1>METAL SLUG MAP</h1>
+      <div class="muted" id="gameName"></div>
+      <h2>Mission</h2>
+      <div class="btnrow" id="missionBtns"></div>
+      <h2>Section</h2>
+      <div class="btnrow" id="sectionBtns"></div>
+      <h2>Pieces</h2>
+      <div id="pieceList"></div>
+    </div>
+    <div id="main">
+      <noscript><div id="noscript">This interactive map requires JavaScript.</div></noscript>
+      <canvas id="cv"></canvas>
+      <button id="menuBtn" aria-label="Toggle menu">☰</button>
+      <div id="help">drag = pan · wheel = zoom</div>
+      <div id="hud"></div>
+    </div>
+    <script type="module" src="js/main.js"></script>
+  </body>
+</html>

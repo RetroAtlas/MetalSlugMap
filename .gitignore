@@ -13,3 +13,6 @@ __pycache__/
 *.bin
 *.cue
 *.chd
+
+# local preview config
+.claude/

@@ -1,0 +1,1020 @@
+{
+ "game": "Metal Slug X (PS1 NTSC-U)",
+ "tile": 16,
+ "missions": [
+  {
+   "short": "X1",
+   "name": "Mission 1",
+   "sections": [
+    {
+     "file": "X1_00.BIN",
+     "pieces": [
+      {
+       "png": "pieces/msx/x1_00_00.png",
+       "w": 544,
+       "h": 256,
+       "tiles_w": 34,
+       "tiles_h": 16
+      },
+      {
+       "png": "pieces/msx/x1_00_01.png",
+       "w": 16,
+       "h": 256,
+       "tiles_w": 1,
+       "tiles_h": 16
+      },
+      {
+       "png": "pieces/msx/x1_00_02.png",
+       "w": 416,
+       "h": 256,
+       "tiles_w": 26,
+       "tiles_h": 16
+      },
+      {
+       "png": "pieces/msx/x1_00_03.png",
+       "w": 320,
+       "h": 256,
+       "tiles_w": 20,
+       "tiles_h": 16
+      },
+      {
+       "png": "pieces/msx/x1_00_04.png",
+       "w": 320,
+       "h": 256,
+       "tiles_w": 20,
+       "tiles_h": 16
+      },
+      {
+       "png": "pieces/msx/x1_00_05.png",
+       "w": 368,
+       "h": 128,
+       "tiles_w": 23,
+       "tiles_h": 8
+      },
+      {
+       "png": "pieces/msx/x1_00_06.png",
+       "w": 368,
+       "h": 128,
+       "tiles_w": 23,
+       "tiles_h": 8
+      },
+      {
+       "png": "pieces/msx/x1_00_07.png",
+       "w": 256,
+       "h": 176,
+       "tiles_w": 16,
+       "tiles_h": 11
+      },
+      {
+       "png": "pieces/msx/x1_00_08.png",
+       "w": 96,
+       "h": 256,
+       "tiles_w": 6,
+       "tiles_h": 16
+      },
+      {
+       "png": "pieces/msx/x1_00_09.png",
+       "w": 320,
+       "h": 256,
+       "tiles_w": 20,
+       "tiles_h": 16
+      },
+      {
+       "png": "pieces/msx/x1_00_10.png",
+       "w": 1024,
+       "h": 224,
+       "tiles_w": 64,
+       "tiles_h": 14
+      },
+      {
+       "png": "pieces/msx/x1_00_11.png",
+       "w": 320,
+       "h": 256,
+       "tiles_w": 20,
+       "tiles_h": 16
+      },
+      {
+       "png": "pieces/msx/x1_00_12.png",
+       "w": 320,
+       "h": 256,
+       "tiles_w": 20,
+       "tiles_h": 16
+      },
+      {
+       "png": "pieces/msx/x1_00_13.png",
+       "w": 320,
+       "h": 256,
+       "tiles_w": 20,
+       "tiles_h": 16
+      },
+      {
+       "png": "pieces/msx/x1_00_14.png",
+       "w": 224,
+       "h": 256,
+       "tiles_w": 14,
+       "tiles_h": 16
+      }
+     ]
+    },
+    {
+     "file": "X1_07.BIN",
+     "pieces": [
+      {
+       "png": "pieces/msx/x1_07_00.png",
+       "w": 320,
+       "h": 256,
+       "tiles_w": 20,
+       "tiles_h": 16
+      },
+      {
+       "png": "pieces/msx/x1_07_01.png",
+       "w": 320,
+       "h": 256,
+       "tiles_w": 20,
+       "tiles_h": 16
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "short": "X22",
+   "name": "Mission 2-2",
+   "sections": [
+    {
+     "file": "X22_00.BIN",
+     "pieces": [
+      {
+       "png": "pieces/msx/x22_00_00.png",
+       "w": 320,
+       "h": 416,
+       "tiles_w": 20,
+       "tiles_h": 26
+      },
+      {
+       "png": "pieces/msx/x22_00_01.png",
+       "w": 64,
+       "h": 416,
+       "tiles_w": 4,
+       "tiles_h": 26
+      },
+      {
+       "png": "pieces/msx/x22_00_02.png",
+       "w": 368,
+       "h": 512,
+       "tiles_w": 23,
+       "tiles_h": 32
+      },
+      {
+       "png": "pieces/msx/x22_00_03.png",
+       "w": 224,
+       "h": 512,
+       "tiles_w": 14,
+       "tiles_h": 32
+      },
+      {
+       "png": "pieces/msx/x22_00_04.png",
+       "w": 224,
+       "h": 576,
+       "tiles_w": 14,
+       "tiles_h": 36
+      },
+      {
+       "png": "pieces/msx/x22_00_05.png",
+       "w": 288,
+       "h": 544,
+       "tiles_w": 18,
+       "tiles_h": 34
+      },
+      {
+       "png": "pieces/msx/x22_00_06.png",
+       "w": 224,
+       "h": 544,
+       "tiles_w": 14,
+       "tiles_h": 34
+      },
+      {
+       "png": "pieces/msx/x22_00_07.png",
+       "w": 320,
+       "h": 432,
+       "tiles_w": 20,
+       "tiles_h": 27
+      },
+      {
+       "png": "pieces/msx/x22_00_08.png",
+       "w": 688,
+       "h": 256,
+       "tiles_w": 43,
+       "tiles_h": 16
+      },
+      {
+       "png": "pieces/msx/x22_00_09.png",
+       "w": 320,
+       "h": 256,
+       "tiles_w": 20,
+       "tiles_h": 16
+      },
+      {
+       "png": "pieces/msx/x22_00_10.png",
+       "w": 320,
+       "h": 256,
+       "tiles_w": 20,
+       "tiles_h": 16
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "short": "X23",
+   "name": "Mission 2-3",
+   "sections": [
+    {
+     "file": "X23_00.BIN",
+     "pieces": [
+      {
+       "png": "pieces/msx/x23_00_00.png",
+       "w": 320,
+       "h": 48,
+       "tiles_w": 20,
+       "tiles_h": 3
+      },
+      {
+       "png": "pieces/msx/x23_00_01.png",
+       "w": 320,
+       "h": 48,
+       "tiles_w": 20,
+       "tiles_h": 3
+      },
+      {
+       "png": "pieces/msx/x23_00_02.png",
+       "w": 320,
+       "h": 48,
+       "tiles_w": 20,
+       "tiles_h": 3
+      },
+      {
+       "png": "pieces/msx/x23_00_03.png",
+       "w": 320,
+       "h": 48,
+       "tiles_w": 20,
+       "tiles_h": 3
+      },
+      {
+       "png": "pieces/msx/x23_00_04.png",
+       "w": 320,
+       "h": 48,
+       "tiles_w": 20,
+       "tiles_h": 3
+      },
+      {
+       "png": "pieces/msx/x23_00_05.png",
+       "w": 320,
+       "h": 48,
+       "tiles_w": 20,
+       "tiles_h": 3
+      },
+      {
+       "png": "pieces/msx/x23_00_06.png",
+       "w": 320,
+       "h": 48,
+       "tiles_w": 20,
+       "tiles_h": 3
+      },
+      {
+       "png": "pieces/msx/x23_00_07.png",
+       "w": 320,
+       "h": 48,
+       "tiles_w": 20,
+       "tiles_h": 3
+      },
+      {
+       "png": "pieces/msx/x23_00_08.png",
+       "w": 320,
+       "h": 48,
+       "tiles_w": 20,
+       "tiles_h": 3
+      },
+      {
+       "png": "pieces/msx/x23_00_09.png",
+       "w": 320,
+       "h": 48,
+       "tiles_w": 20,
+       "tiles_h": 3
+      },
+      {
+       "png": "pieces/msx/x23_00_10.png",
+       "w": 320,
+       "h": 48,
+       "tiles_w": 20,
+       "tiles_h": 3
+      },
+      {
+       "png": "pieces/msx/x23_00_11.png",
+       "w": 320,
+       "h": 48,
+       "tiles_w": 20,
+       "tiles_h": 3
+      },
+      {
+       "png": "pieces/msx/x23_00_12.png",
+       "w": 320,
+       "h": 48,
+       "tiles_w": 20,
+       "tiles_h": 3
+      },
+      {
+       "png": "pieces/msx/x23_00_13.png",
+       "w": 384,
+       "h": 144,
+       "tiles_w": 24,
+       "tiles_h": 9
+      },
+      {
+       "png": "pieces/msx/x23_00_14.png",
+       "w": 672,
+       "h": 128,
+       "tiles_w": 42,
+       "tiles_h": 8
+      },
+      {
+       "png": "pieces/msx/x23_00_15.png",
+       "w": 688,
+       "h": 128,
+       "tiles_w": 43,
+       "tiles_h": 8
+      },
+      {
+       "png": "pieces/msx/x23_00_16.png",
+       "w": 720,
+       "h": 112,
+       "tiles_w": 45,
+       "tiles_h": 7
+      },
+      {
+       "png": "pieces/msx/x23_00_17.png",
+       "w": 736,
+       "h": 176,
+       "tiles_w": 46,
+       "tiles_h": 11
+      },
+      {
+       "png": "pieces/msx/x23_00_18.png",
+       "w": 736,
+       "h": 96,
+       "tiles_w": 46,
+       "tiles_h": 6
+      },
+      {
+       "png": "pieces/msx/x23_00_19.png",
+       "w": 768,
+       "h": 128,
+       "tiles_w": 48,
+       "tiles_h": 8
+      },
+      {
+       "png": "pieces/msx/x23_00_20.png",
+       "w": 784,
+       "h": 192,
+       "tiles_w": 49,
+       "tiles_h": 12
+      },
+      {
+       "png": "pieces/msx/x23_00_21.png",
+       "w": 560,
+       "h": 192,
+       "tiles_w": 35,
+       "tiles_h": 12
+      },
+      {
+       "png": "pieces/msx/x23_00_22.png",
+       "w": 720,
+       "h": 256,
+       "tiles_w": 45,
+       "tiles_h": 16
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "short": "X3",
+   "name": "Mission 3",
+   "sections": [
+    {
+     "file": "X3_00.BIN",
+     "pieces": [
+      {
+       "png": "pieces/msx/x3_00_00.png",
+       "w": 256,
+       "h": 288,
+       "tiles_w": 16,
+       "tiles_h": 18
+      },
+      {
+       "png": "pieces/msx/x3_00_01.png",
+       "w": 256,
+       "h": 272,
+       "tiles_w": 16,
+       "tiles_h": 17
+      },
+      {
+       "png": "pieces/msx/x3_00_02.png",
+       "w": 192,
+       "h": 80,
+       "tiles_w": 12,
+       "tiles_h": 5
+      },
+      {
+       "png": "pieces/msx/x3_00_03.png",
+       "w": 192,
+       "h": 96,
+       "tiles_w": 12,
+       "tiles_h": 6
+      },
+      {
+       "png": "pieces/msx/x3_00_04.png",
+       "w": 192,
+       "h": 80,
+       "tiles_w": 12,
+       "tiles_h": 5
+      },
+      {
+       "png": "pieces/msx/x3_00_05.png",
+       "w": 144,
+       "h": 80,
+       "tiles_w": 9,
+       "tiles_h": 5
+      },
+      {
+       "png": "pieces/msx/x3_00_06.png",
+       "w": 512,
+       "h": 224,
+       "tiles_w": 32,
+       "tiles_h": 14
+      },
+      {
+       "png": "pieces/msx/x3_00_07.png",
+       "w": 256,
+       "h": 272,
+       "tiles_w": 16,
+       "tiles_h": 17
+      },
+      {
+       "png": "pieces/msx/x3_00_08.png",
+       "w": 144,
+       "h": 272,
+       "tiles_w": 9,
+       "tiles_h": 17
+      },
+      {
+       "png": "pieces/msx/x3_00_09.png",
+       "w": 336,
+       "h": 272,
+       "tiles_w": 21,
+       "tiles_h": 17
+      },
+      {
+       "png": "pieces/msx/x3_00_10.png",
+       "w": 256,
+       "h": 224,
+       "tiles_w": 16,
+       "tiles_h": 14
+      }
+     ]
+    },
+    {
+     "file": "X3_022.BIN",
+     "pieces": [
+      {
+       "png": "pieces/msx/x3_022_00.png",
+       "w": 128,
+       "h": 112,
+       "tiles_w": 8,
+       "tiles_h": 7
+      },
+      {
+       "png": "pieces/msx/x3_022_01.png",
+       "w": 288,
+       "h": 288,
+       "tiles_w": 18,
+       "tiles_h": 18
+      },
+      {
+       "png": "pieces/msx/x3_022_02.png",
+       "w": 192,
+       "h": 80,
+       "tiles_w": 12,
+       "tiles_h": 5
+      },
+      {
+       "png": "pieces/msx/x3_022_03.png",
+       "w": 224,
+       "h": 144,
+       "tiles_w": 14,
+       "tiles_h": 9
+      },
+      {
+       "png": "pieces/msx/x3_022_04.png",
+       "w": 1024,
+       "h": 272,
+       "tiles_w": 64,
+       "tiles_h": 17
+      },
+      {
+       "png": "pieces/msx/x3_022_05.png",
+       "w": 256,
+       "h": 144,
+       "tiles_w": 16,
+       "tiles_h": 9
+      }
+     ]
+    },
+    {
+     "file": "X3_041.BIN",
+     "pieces": [
+      {
+       "png": "pieces/msx/x3_041_00.png",
+       "w": 320,
+       "h": 288,
+       "tiles_w": 20,
+       "tiles_h": 18
+      },
+      {
+       "png": "pieces/msx/x3_041_01.png",
+       "w": 128,
+       "h": 112,
+       "tiles_w": 8,
+       "tiles_h": 7
+      },
+      {
+       "png": "pieces/msx/x3_041_02.png",
+       "w": 768,
+       "h": 272,
+       "tiles_w": 48,
+       "tiles_h": 17
+      },
+      {
+       "png": "pieces/msx/x3_041_03.png",
+       "w": 416,
+       "h": 240,
+       "tiles_w": 26,
+       "tiles_h": 15
+      },
+      {
+       "png": "pieces/msx/x3_041_04.png",
+       "w": 192,
+       "h": 240,
+       "tiles_w": 12,
+       "tiles_h": 15
+      }
+     ]
+    },
+    {
+     "file": "X3_064.BIN",
+     "pieces": [
+      {
+       "png": "pieces/msx/x3_064_00.png",
+       "w": 192,
+       "h": 64,
+       "tiles_w": 12,
+       "tiles_h": 4
+      },
+      {
+       "png": "pieces/msx/x3_064_01.png",
+       "w": 192,
+       "h": 80,
+       "tiles_w": 12,
+       "tiles_h": 5
+      },
+      {
+       "png": "pieces/msx/x3_064_02.png",
+       "w": 288,
+       "h": 160,
+       "tiles_w": 18,
+       "tiles_h": 10
+      },
+      {
+       "png": "pieces/msx/x3_064_03.png",
+       "w": 288,
+       "h": 160,
+       "tiles_w": 18,
+       "tiles_h": 10
+      },
+      {
+       "png": "pieces/msx/x3_064_04.png",
+       "w": 288,
+       "h": 160,
+       "tiles_w": 18,
+       "tiles_h": 10
+      },
+      {
+       "png": "pieces/msx/x3_064_05.png",
+       "w": 192,
+       "h": 80,
+       "tiles_w": 12,
+       "tiles_h": 5
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "short": "X4",
+   "name": "Mission 4",
+   "sections": [
+    {
+     "file": "X4_042.BIN",
+     "pieces": [
+      {
+       "png": "pieces/msx/x4_042_00.png",
+       "w": 960,
+       "h": 512,
+       "tiles_w": 60,
+       "tiles_h": 32
+      }
+     ]
+    },
+    {
+     "file": "X4_051.BIN",
+     "pieces": [
+      {
+       "png": "pieces/msx/x4_051_00.png",
+       "w": 96,
+       "h": 224,
+       "tiles_w": 6,
+       "tiles_h": 14
+      },
+      {
+       "png": "pieces/msx/x4_051_01.png",
+       "w": 64,
+       "h": 304,
+       "tiles_w": 4,
+       "tiles_h": 19
+      },
+      {
+       "png": "pieces/msx/x4_051_02.png",
+       "w": 64,
+       "h": 304,
+       "tiles_w": 4,
+       "tiles_h": 19
+      },
+      {
+       "png": "pieces/msx/x4_051_03.png",
+       "w": 64,
+       "h": 304,
+       "tiles_w": 4,
+       "tiles_h": 19
+      },
+      {
+       "png": "pieces/msx/x4_051_04.png",
+       "w": 64,
+       "h": 304,
+       "tiles_w": 4,
+       "tiles_h": 19
+      },
+      {
+       "png": "pieces/msx/x4_051_05.png",
+       "w": 16,
+       "h": 304,
+       "tiles_w": 1,
+       "tiles_h": 19
+      },
+      {
+       "png": "pieces/msx/x4_051_06.png",
+       "w": 16,
+       "h": 304,
+       "tiles_w": 1,
+       "tiles_h": 19
+      },
+      {
+       "png": "pieces/msx/x4_051_07.png",
+       "w": 16,
+       "h": 304,
+       "tiles_w": 1,
+       "tiles_h": 19
+      },
+      {
+       "png": "pieces/msx/x4_051_08.png",
+       "w": 16,
+       "h": 304,
+       "tiles_w": 1,
+       "tiles_h": 19
+      },
+      {
+       "png": "pieces/msx/x4_051_09.png",
+       "w": 32,
+       "h": 304,
+       "tiles_w": 2,
+       "tiles_h": 19
+      },
+      {
+       "png": "pieces/msx/x4_051_10.png",
+       "w": 32,
+       "h": 304,
+       "tiles_w": 2,
+       "tiles_h": 19
+      },
+      {
+       "png": "pieces/msx/x4_051_11.png",
+       "w": 48,
+       "h": 304,
+       "tiles_w": 3,
+       "tiles_h": 19
+      },
+      {
+       "png": "pieces/msx/x4_051_12.png",
+       "w": 48,
+       "h": 304,
+       "tiles_w": 3,
+       "tiles_h": 19
+      },
+      {
+       "png": "pieces/msx/x4_051_13.png",
+       "w": 48,
+       "h": 304,
+       "tiles_w": 3,
+       "tiles_h": 19
+      },
+      {
+       "png": "pieces/msx/x4_051_14.png",
+       "w": 48,
+       "h": 304,
+       "tiles_w": 3,
+       "tiles_h": 19
+      },
+      {
+       "png": "pieces/msx/x4_051_15.png",
+       "w": 64,
+       "h": 320,
+       "tiles_w": 4,
+       "tiles_h": 20
+      },
+      {
+       "png": "pieces/msx/x4_051_16.png",
+       "w": 64,
+       "h": 320,
+       "tiles_w": 4,
+       "tiles_h": 20
+      },
+      {
+       "png": "pieces/msx/x4_051_17.png",
+       "w": 64,
+       "h": 320,
+       "tiles_w": 4,
+       "tiles_h": 20
+      },
+      {
+       "png": "pieces/msx/x4_051_18.png",
+       "w": 64,
+       "h": 320,
+       "tiles_w": 4,
+       "tiles_h": 20
+      },
+      {
+       "png": "pieces/msx/x4_051_19.png",
+       "w": 48,
+       "h": 336,
+       "tiles_w": 3,
+       "tiles_h": 21
+      },
+      {
+       "png": "pieces/msx/x4_051_20.png",
+       "w": 48,
+       "h": 336,
+       "tiles_w": 3,
+       "tiles_h": 21
+      },
+      {
+       "png": "pieces/msx/x4_051_21.png",
+       "w": 48,
+       "h": 336,
+       "tiles_w": 3,
+       "tiles_h": 21
+      },
+      {
+       "png": "pieces/msx/x4_051_22.png",
+       "w": 48,
+       "h": 336,
+       "tiles_w": 3,
+       "tiles_h": 21
+      },
+      {
+       "png": "pieces/msx/x4_051_23.png",
+       "w": 48,
+       "h": 320,
+       "tiles_w": 3,
+       "tiles_h": 20
+      },
+      {
+       "png": "pieces/msx/x4_051_24.png",
+       "w": 48,
+       "h": 320,
+       "tiles_w": 3,
+       "tiles_h": 20
+      },
+      {
+       "png": "pieces/msx/x4_051_25.png",
+       "w": 48,
+       "h": 320,
+       "tiles_w": 3,
+       "tiles_h": 20
+      },
+      {
+       "png": "pieces/msx/x4_051_26.png",
+       "w": 48,
+       "h": 320,
+       "tiles_w": 3,
+       "tiles_h": 20
+      },
+      {
+       "png": "pieces/msx/x4_051_27.png",
+       "w": 512,
+       "h": 208,
+       "tiles_w": 32,
+       "tiles_h": 13
+      }
+     ]
+    },
+    {
+     "file": "X4_080.BIN",
+     "pieces": [
+      {
+       "png": "pieces/msx/x4_080_00.png",
+       "w": 320,
+       "h": 208,
+       "tiles_w": 20,
+       "tiles_h": 13
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "short": "X53",
+   "name": "Mission 5-3",
+   "sections": [
+    {
+     "file": "X53_00.BIN",
+     "pieces": [
+      {
+       "png": "pieces/msx/x53_00_00.png",
+       "w": 416,
+       "h": 256,
+       "tiles_w": 26,
+       "tiles_h": 16
+      },
+      {
+       "png": "pieces/msx/x53_00_01.png",
+       "w": 224,
+       "h": 240,
+       "tiles_w": 14,
+       "tiles_h": 15
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "short": "X61",
+   "name": "Mission 6-1",
+   "sections": [
+    {
+     "file": "X61_001.BIN",
+     "pieces": [
+      {
+       "png": "pieces/msx/x61_001_00.png",
+       "w": 256,
+       "h": 432,
+       "tiles_w": 16,
+       "tiles_h": 27
+      },
+      {
+       "png": "pieces/msx/x61_001_01.png",
+       "w": 320,
+       "h": 432,
+       "tiles_w": 20,
+       "tiles_h": 27
+      },
+      {
+       "png": "pieces/msx/x61_001_02.png",
+       "w": 320,
+       "h": 32,
+       "tiles_w": 20,
+       "tiles_h": 2
+      },
+      {
+       "png": "pieces/msx/x61_001_03.png",
+       "w": 320,
+       "h": 224,
+       "tiles_w": 20,
+       "tiles_h": 14
+      },
+      {
+       "png": "pieces/msx/x61_001_04.png",
+       "w": 112,
+       "h": 208,
+       "tiles_w": 7,
+       "tiles_h": 13
+      },
+      {
+       "png": "pieces/msx/x61_001_05.png",
+       "w": 128,
+       "h": 160,
+       "tiles_w": 8,
+       "tiles_h": 10
+      },
+      {
+       "png": "pieces/msx/x61_001_06.png",
+       "w": 112,
+       "h": 416,
+       "tiles_w": 7,
+       "tiles_h": 26
+      },
+      {
+       "png": "pieces/msx/x61_001_07.png",
+       "w": 128,
+       "h": 320,
+       "tiles_w": 8,
+       "tiles_h": 20
+      },
+      {
+       "png": "pieces/msx/x61_001_08.png",
+       "w": 320,
+       "h": 320,
+       "tiles_w": 20,
+       "tiles_h": 20
+      },
+      {
+       "png": "pieces/msx/x61_001_09.png",
+       "w": 256,
+       "h": 128,
+       "tiles_w": 16,
+       "tiles_h": 8
+      },
+      {
+       "png": "pieces/msx/x61_001_10.png",
+       "w": 256,
+       "h": 192,
+       "tiles_w": 16,
+       "tiles_h": 12
+      },
+      {
+       "png": "pieces/msx/x61_001_11.png",
+       "w": 800,
+       "h": 256,
+       "tiles_w": 50,
+       "tiles_h": 16
+      },
+      {
+       "png": "pieces/msx/x61_001_12.png",
+       "w": 320,
+       "h": 320,
+       "tiles_w": 20,
+       "tiles_h": 20
+      },
+      {
+       "png": "pieces/msx/x61_001_13.png",
+       "w": 800,
+       "h": 32,
+       "tiles_w": 50,
+       "tiles_h": 2
+      },
+      {
+       "png": "pieces/msx/x61_001_14.png",
+       "w": 320,
+       "h": 32,
+       "tiles_w": 20,
+       "tiles_h": 2
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "short": "X63",
+   "name": "Mission 6-3",
+   "sections": [
+    {
+     "file": "X63_001.BIN",
+     "pieces": [
+      {
+       "png": "pieces/msx/x63_001_00.png",
+       "w": 480,
+       "h": 208,
+       "tiles_w": 30,
+       "tiles_h": 13
+      },
+      {
+       "png": "pieces/msx/x63_001_02.png",
+       "w": 416,
+       "h": 240,
+       "tiles_w": 26,
+       "tiles_h": 15
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
