@@ -54,7 +54,7 @@ def chunks(data):
     """
     p = 0
     while p + 8 <= len(data):
-        kind = struct.unpack_from("<I", data, p)[0]
+        kind = struct.unpack_from("<I", data, p)[0] & 0xFFFFFF  # top byte carries flags
         if kind == TILELIST:
             count = struct.unpack_from("<H", data, p + 4)[0]
             if _valid_tilelist(data, p, count):
