@@ -58,21 +58,20 @@ function selectSection(s, btn) {
   [...$("sectionBtns").children].forEach((b) => b.classList.remove("on"));
   btn?.classList.add("on");
 
-  // strip pieces form the continuous playfield; the rest stack beneath it
-  const strip = s.pieces.filter((p) => p.strip);
-  const rest = s.pieces.filter((p) => !p.strip);
-  layout = strip.map((p) => ({ piece: p, x: p.x, y: 0 }));
-  let y = (s.playfield_h || 0) + GAP * 2;
-  for (const p of rest) {
-    layout.push({ piece: p, x: 0, y });
-    y += p.h + GAP;
+  // each band is a layer laid left to right; bands stack tallest first
+  const bandY = [];
+  let y = 0;
+  for (const b of s.bands || []) {
+    bandY.push(y);
+    y += b.h + GAP * 2;
   }
+  layout = s.pieces.map((p) => ({ piece: p, x: p.x, y: bandY[p.band] || 0 }));
 
   const list = $("pieceList");
   list.innerHTML = "";
   layout.forEach((at, i) => {
     const b = document.createElement("button");
-    const tag = at.piece.strip ? "" : " · layer";
+    const tag = at.piece.band === 0 ? "" : ` · layer ${at.piece.band}`;
     b.innerHTML = `${i + 1}. <span class="dim">${at.piece.tiles_w}×${at.piece.tiles_h} tiles · ${at.piece.w}×${at.piece.h}px${tag}</span>`;
     b.onclick = () => {
       [...list.children].forEach((x) => x.classList.remove("on"));

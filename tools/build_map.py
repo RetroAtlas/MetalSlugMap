@@ -101,12 +101,15 @@ def main():
             ps = pieces(raw)
             if not ps:
                 continue
-            # the playfield is the tallest piece height; those pieces run left to
-            # right in file order, so they lay out as one strip and the rest
-            # (parallax layers, set dressing) stack under it
-            playfield = max(p["h"] for p in ps)
-            sec_entry = {"file": sec, "playfield_h": playfield * TILE, "pieces": []}
-            strip_x = 0
+            # pieces of one height are one layer of the stage and run left to
+            # right in file order; the tallest layer is the playfield, shorter
+            # ones are parallax and set dressing
+            heights = sorted({p["h"] for p in ps}, reverse=True)
+            band_of = {h: i for i, h in enumerate(heights)}
+            sec_entry = {"file": sec,
+                         "bands": [{"h": h * TILE} for h in heights],
+                         "pieces": []}
+            band_x = defaultdict(int)
             for i, p in enumerate(ps):
                 vram = stage_vram(index, p["tiles"], prefer=[sec, base] + sections)
                 img, W, H, drawn = render(vram, p)
@@ -114,12 +117,11 @@ def main():
                     continue
                 rel = f"pieces/msx/{sec[:-4].lower()}_{i:02d}.png"
                 write_png(out / rel, W, H, bytes(img), keep_alpha=True)
-                strip = p["h"] == playfield
+                b = band_of[p["h"]]
                 sec_entry["pieces"].append({"png": rel, "w": W, "h": H,
                                             "tiles_w": p["w"], "tiles_h": p["h"],
-                                            "strip": strip, "x": strip_x if strip else 0})
-                if strip:
-                    strip_x += W
+                                            "band": b, "x": band_x[b]})
+                band_x[b] += W
             if sec_entry["pieces"]:
                 entry["sections"].append(sec_entry)
                 print(f"  {sec}: {len(sec_entry['pieces'])} pieces")
