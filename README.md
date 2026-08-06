@@ -2,7 +2,7 @@
 
 An in-progress interactive map of the Metal Slug games on PlayStation, extracted straight from the game discs — starting with **Metal Slug X** (NTSC-U). Sister project to [Oddworld Map](https://oddworldmap.com/); same idea, a much harder game to extract.
 
-**Status: early.** The stage artwork extracts cleanly today; the stage *layout* (how tiles assemble into each scrolling mission) and the *spawn tables* (POWs, food, weapon drops, hidden objects and branch triggers) are an ongoing reverse-engineering effort. There is no viewer yet — this repo currently holds the extraction tooling and its findings.
+**Status: usable.** Every stage piece in the game comes off the disc in its true colours and is browsable in the viewer. What is still open is *placement* — where the game puts those pieces relative to one another — and the *spawn tables* (POWs, food, weapon drops, hidden objects and branch triggers), which are not in the stage files and have not been located yet.
 
 ## What works now
 
@@ -33,9 +33,9 @@ python3 tools/build_map.py --disc "/path/to/Metal Slug X.bin"
 python3 -m http.server 8479 -d public      # then open http://localhost:8479
 ```
 
-That currently yields **277 pieces across all 12 missions**. Press `/` to search, and the URL hash carries the current view so a link reopens it. Pick a mission, then a section: pieces of the same height are one layer of the stage and lay out left to right, so each section reads as a horizontal map with its parallax layers beneath. Pick a piece from the list to zoom to it, or pan and zoom freely.
+That currently yields **219 stage pieces and 16 animated objects across all 12 missions**. Pieces of the same height are one layer of the stage and lay out left to right, butted together where their edges actually match and separated by a marked break where they do not.
 
-`--disc` can be omitted if `$METAL_SLUG_DISC` points at the image. Output lands in `out/` (git-ignored).
+`--disc` can be omitted if `$METAL_SLUG_DISC` points at the image. `tools/render_map.py` writes single sections to `out/` (git-ignored) when you want the PNGs on their own.
 
 ## Roadmap
 
@@ -46,7 +46,8 @@ The map is being built as a **hybrid**, so there is something usable at every st
 3. **Stage layout** — done: tilemaps place tiles into stage sections, and each section renders end to end.
 4. **Viewer** — browse by mission and section, pan and zoom, jump to a piece, search sections, and share a view by URL. Object search and annotations wait on the spawn tables.
 5. **Streaming order** — done: a section's number is a path through the stage, so sorting those numbers gives the order the game loads them, and each piece is rendered against the memory state where its tiles join. This is what took the artwork from plausible-looking mosaics to the real stages.
-6. **Spawn tables** — where POWs, items, hidden objects and branch triggers live. This is the data that makes the map worth having, and the least documented: the leads point at `MISS<nn>.BIN`, which are MIPS overlays, so this milestone likely means disassembling mission code rather than reading a table.
+6. **Piece placement** — open. The stage is a library of tilemap chunks and their arrangement is not in the section files, so the builder only joins two pieces where their facing edges actually match and marks the joins it cannot make. Runs that do join come out as real strips of stage.
+7. **Spawn tables** — open, and the least documented. POWs, items, hidden objects and branch triggers are not in the stage files; `MISS<nn>.BIN` turned out to be Combat School rather than the main missions. See [CLAUDE.md](CLAUDE.md) for what has been ruled out and which files are still worth opening.
 
 Unlike Oddworld — where a community decompilation ([alive_reversing](https://github.com/AliveTeam/alive_reversing)) handed us every structure — Metal Slug X has no such reference; the only ground truth is the disc and the game executable.
 
