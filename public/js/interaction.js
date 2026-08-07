@@ -7,33 +7,88 @@ import { $, S, emit, toWorld } from "./state.js";
 
 const cv = $("cv");
 const tip = $("tip");
+const PAGE_ZOOM_MIN = 1.02;   // a pinch settles a hair off 1, so 1 is not "unzoomed"
 
-let drag = null;
+// The canvas takes touch gestures for itself, which would also swallow the
+// pinch that ends a browser page zoom; while one is in effect it hands
+// two-finger gestures back instead of zooming the map.
+const vv = window.visualViewport;
+let pageZoomed = false;
+function syncPageZoom() {
+  pageZoomed = vv.scale > PAGE_ZOOM_MIN;
+  document.body.classList.toggle("page-zoomed", pageZoomed);
+}
+if (vv) {
+  vv.addEventListener("resize", syncPageZoom);
+  vv.addEventListener("scroll", syncPageZoom);
+  syncPageZoom();
+}
+
+const pointers = new Map();   // live pointerId -> {x, y} in canvas space
+let pan = null;
 let moved = 0;
+let pinch = 0;
+
+function at(e) {
+  const r = cv.getBoundingClientRect();
+  return { x: e.clientX - r.left, y: e.clientY - r.top };
+}
 
 cv.addEventListener("pointerdown", (e) => {
-  drag = { x: e.clientX, y: e.clientY, cx: S.cam.x, cy: S.cam.y, id: e.pointerId };
-  moved = 0;
-  cv.setPointerCapture(e.pointerId);
-  cv.classList.add("panning");
+  const p = at(e);
+  pointers.set(e.pointerId, p);
+  try {
+    // capture would hold a touch pinch back from the browser, but a mouse drag
+    // released off the canvas needs it to end at all
+    if (!pageZoomed || e.pointerType !== "touch") cv.setPointerCapture(e.pointerId);
+  } catch {
+    /* pointer already lifted */
+  }
+  if (pointers.size === 1) {
+    pan = { x: p.x, y: p.y, cx: S.cam.x, cy: S.cam.y };
+    moved = 0;
+    cv.classList.add("panning");
+  } else if (pointers.size === 2) {
+    pan = null;
+    cv.classList.remove("panning");
+    const [a, b] = pointers.values();
+    pinch = Math.hypot(a.x - b.x, a.y - b.y);
+  }
 });
 
 cv.addEventListener("pointermove", (e) => {
-  if (drag && e.pointerId === drag.id) {
-    moved += Math.abs(e.clientX - drag.x) + Math.abs(e.clientY - drag.y);
-    S.cam.x = drag.cx - (e.clientX - drag.x) / S.cam.z;
-    S.cam.y = drag.cy - (e.clientY - drag.y) / S.cam.z;
-    draw();
+  const p = at(e);
+  if (pointers.has(e.pointerId)) pointers.set(e.pointerId, p);
+
+  if (pointers.size >= 2) {
+    const [a, b] = pointers.values();
+    const dist = Math.hypot(a.x - b.x, a.y - b.y);
+    if (pageZoomed) {
+      pinch = dist;   // resuming from a stale baseline would jump the map
+      return;
+    }
+    if (dist && pinch) zoomAt((a.x + b.x) / 2, (a.y + b.y) / 2, dist / pinch);
+    pinch = dist;
     return;
   }
-  const r = cv.getBoundingClientRect();
-  const w = toWorld(cv, e.clientX - r.left, e.clientY - r.top);
-  const at = pieceAt(w.x, w.y);
-  if (at !== S.hover) {
-    S.hover = at;
+
+  if (pan) {
+    moved += Math.abs(p.x - pan.x) + Math.abs(p.y - pan.y);
+    S.cam.x = pan.cx - (p.x - pan.x) / S.cam.z;
+    S.cam.y = pan.cy - (p.y - pan.y) / S.cam.z;
+    draw();
+    if (e.pointerType === "touch") tip.hidden = true;
+    return;
+  }
+  if (e.pointerType === "touch") return;   // a finger has no hover to report
+
+  const w = toWorld(cv, p.x, p.y);
+  const hit = pieceAt(w.x, w.y);
+  if (hit !== S.hover) {
+    S.hover = hit;
     draw();
   }
-  showTip(at, e.clientX - r.left, e.clientY - r.top);
+  showTip(hit, p.x, p.y);
 });
 
 function showTip(at, sx, sy) {
@@ -64,24 +119,33 @@ function showTip(at, sx, sy) {
   tip.style.top = `${Math.min(sy + 16, r.height - box.height - 8)}px`;
 }
 
-const endDrag = () => {
-  if (drag) pushHash(false);
-  drag = null;
-  cv.classList.remove("panning");
-};
-cv.addEventListener("pointerup", (e) => {
-  if (drag && moved < 5) {
-    const r = cv.getBoundingClientRect();
-    const w = toWorld(cv, e.clientX - r.left, e.clientY - r.top);
-    const at = pieceAt(w.x, w.y);
-    S.selected = at;
-    emit("selection-changed", at);
+function endPointer(e) {
+  const p = pointers.get(e.pointerId);
+  if (!pointers.delete(e.pointerId)) return;
+  const tap = pointers.size === 0 && pan && moved < (e.pointerType === "mouse" ? 5 : 12);
+  if (tap && p) {
+    const w = toWorld(cv, p.x, p.y);
+    const hit = pieceAt(w.x, w.y);
+    S.selected = hit;
+    emit("selection-changed", hit);
     draw();
   }
-  endDrag();
-});
-cv.addEventListener("pointercancel", endDrag);
+  if (pointers.size === 1) {
+    // a pinch that lost a finger carries on as a pan from where the other is
+    const [rest] = pointers.values();
+    pan = { x: rest.x, y: rest.y, cx: S.cam.x, cy: S.cam.y };
+    moved = 99;
+    cv.classList.add("panning");
+  } else if (!pointers.size) {
+    if (pan && moved) pushHash(false);
+    pan = null;
+    cv.classList.remove("panning");
+  }
+}
+cv.addEventListener("pointerup", endPointer);
+cv.addEventListener("pointercancel", endPointer);
 cv.addEventListener("pointerleave", () => {
+  if (pointers.size) return;   // a captured drag only leaves after release
   tip.hidden = true;
   if (S.hover) {
     S.hover = null;

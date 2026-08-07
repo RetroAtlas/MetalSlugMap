@@ -13,7 +13,9 @@ html, body { height: 100%; overflow: hidden; }
 body {
   background: var(--bg); color: var(--text); display: flex;
   font: 13px/1.45 -apple-system, "Segoe UI", sans-serif;
+  -webkit-tap-highlight-color: transparent;
 }
+button, input, .checkrow { touch-action: manipulation; }
 
 #sidebar {
   width: 268px; min-width: 268px; background: var(--panel);
@@ -86,7 +88,13 @@ body {
 .linkbtn:hover { color: var(--accent); }
 
 #main { flex: 1; position: relative; }
-#cv { position: absolute; inset: 0; width: 100%; height: 100%; cursor: grab; touch-action: none; }
+#cv {
+  position: absolute; inset: 0; width: 100%; height: 100%; cursor: grab;
+  touch-action: none; -webkit-user-select: none; user-select: none;
+}
+/* the map keeps every gesture except while a page zoom is on, which needs the
+   pinch that ends it to reach the browser */
+body.page-zoomed #cv { touch-action: pinch-zoom; }
 #cv.panning { cursor: grabbing; }
 #hud, #help {
   position: absolute; bottom: 8px; color: var(--dim); font-size: 11px;
@@ -165,10 +173,17 @@ kbd {
   #sidebar {
     position: absolute; z-index: 25; height: 100%; width: 84vw; max-width: 320px;
     transform: translateX(-100%); transition: transform .2s ease;
-    box-shadow: 4px 0 24px rgba(0, 0, 0, .5);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, .5); -webkit-overflow-scrolling: touch;
   }
   body.menu-open #sidebar { transform: none; }
   body.menu-open #scrim { display: block; position: absolute; inset: 0; z-index: 22; background: rgba(6, 7, 9, .5); }
   #sidebar h1 { padding-left: 56px; }
-  #hud, #placePanel { display: none; }
+  #hud, #help, #tip { display: none; }
+  #placePanel { top: auto; bottom: 10px; left: 10px; right: 10px; width: auto; }
+  #menuBtn, #copyLinkBtn { width: 44px; height: 44px; }
+  #menuBtn { z-index: 30; }   /* stays reachable over the open drawer, to close it */
+  .btnrow button { padding: 8px 12px; }
+  .checkrow { padding: 8px 2px; }
+  #pieceList button, #objectList button, #searchResults button { padding: 8px; }
+  .checkrow kbd { display: none; }
 }

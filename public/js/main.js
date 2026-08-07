@@ -7,7 +7,7 @@ import { applyHash, copyLink, selectMission } from "./navigate.js";
 import { draw, exportPng, resize } from "./render.js";
 import { buildMissionBar, buildToggles } from "./sidebar.js";
 import { buildSearch } from "./search.js";
-import { $, S } from "./state.js";
+import { $, S, on } from "./state.js";
 
 addEventListener("resize", resize);
 
@@ -19,6 +19,9 @@ function toggleMenu(open) {
     open ?? !document.body.classList.contains("menu-open"));
   resize();
 }
+on("section-changed", () => {
+  if (isMobile()) toggleMenu(false);   // picking one reveals the map behind the drawer
+});
 $("menuBtn").onclick = () => toggleMenu();
 $("scrim").onclick = () => toggleMenu(false);
 $("exportBtn").onclick = exportPng;
