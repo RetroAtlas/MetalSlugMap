@@ -2648,7 +2648,7 @@
      "layers": [
       {
        "h": 208,
-       "w": 992
+       "w": 960
       }
      ],
      "pieces": [
@@ -2673,8 +2673,8 @@
        "art": "X4_032.BIN",
        "fit": 10.6,
        "layer": 0,
-       "x": 352,
-       "joins": false
+       "x": 320,
+       "joins": true
       },
       {
        "png": "pieces/msx/x4_080_02.png",
@@ -2685,7 +2685,7 @@
        "art": "X4_032.BIN",
        "fit": 16.2,
        "layer": 0,
-       "x": 672,
+       "x": 640,
        "joins": true
       }
      ],

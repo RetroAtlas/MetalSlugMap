@@ -172,7 +172,8 @@ def main():
                 prev = None
                 for k in ks:
                     s = shot[k]
-                    joins = prev is not None and (seam(prev["right"], s["left"]) or 99) < JOIN
+                    cost = seam(prev["right"], s["left"]) if prev is not None else None
+                    joins = cost is not None and cost < JOIN
                     if prev is not None and not joins:
                         x += BREAK
                     sec["pieces"].append({"png": s["png"], "w": s["w"], "h": s["h"],
