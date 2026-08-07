@@ -29,10 +29,6 @@ export function toWorld(cv, sx, sy) {
   return { x: S.cam.x + sx / S.cam.z, y: S.cam.y + sy / S.cam.z };
 }
 
-export function toScreen(wx, wy) {
-  return { x: (wx - S.cam.x) * S.cam.z, y: (wy - S.cam.y) * S.cam.z };
-}
-
 export function bounds() {
   let w = 0;
   let h = 0;

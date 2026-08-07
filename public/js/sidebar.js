@@ -58,7 +58,6 @@ function mark(bar, want) {
 }
 
 on("mission-changed", (m) => {
-  mark($("missionBtns"), undefined);
   [...$("missionBtns").children].forEach((b) => b.classList.toggle("on", b.textContent === m.short));
   const bar = $("sectionBtns");
   bar.innerHTML = "";

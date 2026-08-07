@@ -1,8 +1,8 @@
 // Pan, zoom, hover inspect, click to select, and the keyboard.
 
-import { pieceAt, sectionName } from "./model.js";
+import { pieceAt } from "./model.js";
 import { draw, exportPng } from "./render.js";
-import { bump, focus, pushHash, stepSection } from "./navigate.js";
+import { bump, pushHash, stepSection } from "./navigate.js";
 import { $, S, emit, toWorld } from "./state.js";
 
 const cv = $("cv");
@@ -73,7 +73,7 @@ cv.addEventListener("pointermove", (e) => {
   }
 
   if (pan) {
-    moved += Math.abs(p.x - pan.x) + Math.abs(p.y - pan.y);
+    moved = Math.max(moved, Math.abs(p.x - pan.x) + Math.abs(p.y - pan.y));
     S.cam.x = pan.cx - (p.x - pan.x) / S.cam.z;
     S.cam.y = pan.cy - (p.y - pan.y) / S.cam.z;
     draw();
@@ -224,9 +224,3 @@ addEventListener("keydown", (e) => {
     draw();
   }
 });
-
-export function selectionLabel(at) {
-  if (!at) return "";
-  if (at.object) return `${sectionName(S.section)} object`;
-  return `${sectionName(S.section)} · layer ${at.piece.layer}`;
-}

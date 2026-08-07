@@ -1,6 +1,6 @@
 // Selecting a mission, a section and a place in it — and putting that in the URL.
 
-import { extent, layoutOf, sectionName } from "./model.js";
+import { layoutOf, sectionName } from "./model.js";
 import { draw } from "./render.js";
 import { $, S, emit } from "./state.js";
 
@@ -115,10 +115,6 @@ export function copyLink() {
 
 export function bump() {
   camToken += 1;
-}
-
-export function widthOf(section) {
-  return extent(section);
 }
 
 addEventListener("hashchange", () => {
