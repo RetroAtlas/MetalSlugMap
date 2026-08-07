@@ -120,7 +120,7 @@ function outlines() {
     ctx.strokeRect(at.x + px / 2, at.y + px / 2, at.piece.w - px, at.piece.h - px);
     const upright = S.section.runs === "v";
     const first = upright ? !at.piece.y : !at.piece.x;
-    if (S.show.seams && !at.piece.joins && !first) {
+    if (S.show.seams && !at.piece.page && !at.piece.joins && !first) {
       ctx.strokeStyle = "rgba(255,120,120,.55)";
       ctx.setLineDash([6 * px, 4 * px]);
       ctx.beginPath();

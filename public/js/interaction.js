@@ -104,13 +104,16 @@ function showTip(at, sx, sy) {
       ["size", `${p.tw}×${p.th} tiles · ${p.w}×${p.h}px`],
       ["art", p.art],
     ]
-    : [
-      ["lane", p.group === 0 ? "0 — main" : `${p.group}`],
-      ["size", `${p.tw}×${p.th} tiles · ${p.w}×${p.h}px`],
-      ["at", `${p.x}, ${p.y}`],
-      ["joins left", p.joins ? "yes" : "no — separate strip"],
-      ["art", `${p.art} (fit ${p.fit})`],
-    ];
+    : p.page
+      ? [["kind", "sprite page"], ["page", p.page],
+        ["size", `${p.w}×${p.h}px`], ["bank", p.art]]
+      : [
+        ["lane", p.group === 0 ? "0 — main" : `${p.group}`],
+        ["size", `${p.tw}×${p.th} tiles · ${p.w}×${p.h}px`],
+        ["at", `${p.x}, ${p.y}`],
+        ["joins left", p.joins ? "yes" : "no — separate strip"],
+        ["art", `${p.art} (fit ${p.fit})`],
+      ];
   tip.innerHTML = rows.map(([k, v]) => `<b>${k}</b><span>${v}</span>`).join("");
   tip.hidden = false;
   const box = tip.getBoundingClientRect();

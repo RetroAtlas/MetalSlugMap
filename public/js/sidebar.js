@@ -64,7 +64,8 @@ on("mission-changed", (m) => {
   for (const s of m.sections) {
     const b = document.createElement("button");
     b.textContent = s.step;
-    b.title = `${s.file} — ${s.pieces.length} pieces, ${s.groups.length} lanes`;
+    b.title = s.bank ? `${s.bank} — ${s.file}, ${s.pieces.length} pages`
+      : `${s.file} — ${s.pieces.length} pieces, ${s.groups.length} lanes`;
     b.dataset.key = s.file;
     b.onclick = () => selectSection(s);
     bar.appendChild(b);
@@ -73,13 +74,17 @@ on("mission-changed", (m) => {
 
 on("section-changed", (s) => {
   mark($("sectionBtns"), s.file);
+  $("pieceHead").textContent = s.bank ? "Sprite pages" : "Stage pieces";
   const list = $("pieceList");
   list.innerHTML = "";
   S.layout.forEach((at, i) => {
     const b = document.createElement("button");
-    const tag = at.piece.group === 0 ? "main lane" : `lane ${at.piece.group}`;
-    const join = at.piece.joins || !at.piece.x ? "" : " · break";
-    b.innerHTML = `${i + 1}. <span class="dim">${at.piece.tw}×${at.piece.th} tiles · ${tag}${join}</span>`;
+    const p = at.piece;
+    const note = p.page
+      ? `page ${p.page} · ${p.w}×${p.h}px`
+      : `${p.tw}×${p.th} tiles · ${p.group === 0 ? "main lane" : `lane ${p.group}`}`
+        + (p.joins || !p.x ? "" : " · break");
+    b.innerHTML = `${i + 1}. <span class="dim">${note}</span>`;
     b.dataset.key = at.piece.png;
     b.onclick = () => focus(at);
     list.appendChild(b);
@@ -112,10 +117,12 @@ on("selection-changed", (at) => {
   const rows = at.object
     ? [["Kind", "Animated object"], ["Frames", p.frames.length],
       ["Tiles", `${p.tw}×${p.th}`], ["Pixels", `${p.w}×${p.h}`], ["Art state", p.art]]
-    : [["Lane", p.group === 0 ? "0 — main" : `${p.group}`],
-      ["Tiles", `${p.tw}×${p.th}`], ["Pixels", `${p.w}×${p.h}`],
-      ["Position", `${p.x}, ${p.y}`], ["Joins", p.joins ? "yes" : "no"],
-      ["Art state", `${p.art} · fit ${p.fit}`]];
+    : p.page
+      ? [["Kind", "Sprite page"], ["Page", p.page], ["Pixels", `${p.w}×${p.h}`], ["Bank", p.art]]
+      : [["Lane", p.group === 0 ? "0 — main" : `${p.group}`],
+        ["Tiles", `${p.tw}×${p.th}`], ["Pixels", `${p.w}×${p.h}`],
+        ["Position", `${p.x}, ${p.y}`], ["Joins", p.joins ? "yes" : "no"],
+        ["Art state", `${p.art} · fit ${p.fit}`]];
   panel.innerHTML = `<h3>${sectionName(S.section)}</h3>`
     + rows.map(([k, v]) => `<div class="pp-row"><span>${k}</span><b>${v}</b></div>`).join("");
   panel.hidden = false;

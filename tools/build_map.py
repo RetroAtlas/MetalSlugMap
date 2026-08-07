@@ -20,8 +20,10 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from disc import Disc
 from png import write_png
+from extract_art import page as art_page
 from render import TILE, best_state, draw
 from section import load_order, pieces, stream
+from vram import tim_records
 
 MISSIONS = [
     ("X1", "Mission 1"),
@@ -30,6 +32,15 @@ MISSIONS = [
     ("X4", "Mission 4"),
     ("X51", "Mission 5-1"), ("X52", "Mission 5-2"), ("X53", "Mission 5-3"),
     ("X61", "Mission 6-1"), ("X62", "Mission 6-2"), ("X63", "Mission 6-3"),
+]
+
+# the sprite banks worth cataloguing: the people and machines the missions run
+# on, as opposed to the art gallery, the endings and the Combat School
+BANKS = [
+    ("Characters", ["STD00", "STD01", "STD02", "STD03", "STD04"]),
+    ("Mummified", ["MUM01", "MUM02", "MUM03", "MUM04"]),
+    ("Fat", ["FAT01", "FAT02", "FAT03", "FAT04"]),
+    ("Vehicles", ["_VHIECLE"]),
 ]
 
 JOIN = 8.0      # seam cost under which two pieces are one strip of stage
@@ -171,6 +182,30 @@ def group(ps):
     return runs
 
 
+def sprites(disc, out):
+    """Lift the character, transformation and vehicle banks to PNG.
+
+    These are plain TIM chains like the stage art, so a page comes off whole —
+    a sheet of every frame the game animates. Cutting the individual frames out
+    would need the assembly data in the `PL\\PAT*` files, which is not decoded.
+    """
+    (out / "sprites").mkdir(parents=True, exist_ok=True)
+    banks = []
+    for label, names in BANKS:
+        for name in names:
+            data = disc.read_file(name + ".BIN")
+            pages = []
+            for i, record in enumerate(tim_records(data)):
+                w, h, pixels = art_page(record)
+                rel = f"sprites/msx/{name.lower()}_{i:02d}.png"
+                write_png(out / rel, w, h, pixels, keep_alpha=True)
+                pages.append({"png": rel, "w": w, "h": h})
+            if pages:
+                banks.append({"group": label, "file": name + ".BIN", "pages": pages})
+                print(f"  {name}: {len(pages)} sprite pages", flush=True)
+    return banks
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--disc", default=os.environ.get("METAL_SLUG_DISC"),
@@ -186,7 +221,8 @@ def main():
     out = Path(args.out)
     (out / "pieces").mkdir(parents=True, exist_ok=True)
 
-    data = {"game": "Metal Slug X (PS1 NTSC-U)", "tile": TILE, "missions": []}
+    data = {"game": "Metal Slug X (PS1 NTSC-U)", "tile": TILE, "missions": [],
+            "sprites": sprites(disc, out) if not only else []}
     for short, display in MISSIONS:
         if only and short not in only:
             continue
@@ -257,8 +293,9 @@ def main():
     (out / "map_data_msx.json").write_text(json.dumps(data, indent=1))
     n = sum(len(s["pieces"]) for m in data["missions"] for s in m["sections"])
     o = sum(len(s["objects"]) for m in data["missions"] for s in m["sections"])
-    print(f"\n{len(data['missions'])} missions, {n} pieces, {o} objects "
-          f"-> {out}/map_data_msx.json")
+    b = sum(len(k["pages"]) for k in data["sprites"])
+    print(f"\n{len(data['missions'])} missions, {n} pieces, {o} objects, "
+          f"{b} sprite pages -> {out}/map_data_msx.json")
 
 
 if __name__ == "__main__":

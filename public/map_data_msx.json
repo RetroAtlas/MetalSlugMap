@@ -3833,5 +3833,291 @@
     }
    ]
   }
+ ],
+ "sprites": [
+  {
+   "group": "Characters",
+   "file": "STD00.BIN",
+   "pages": [
+    {
+     "png": "sprites/msx/std00_00.png",
+     "w": 256,
+     "h": 254
+    },
+    {
+     "png": "sprites/msx/std00_01.png",
+     "w": 256,
+     "h": 194
+    },
+    {
+     "png": "sprites/msx/std00_02.png",
+     "w": 256,
+     "h": 88
+    },
+    {
+     "png": "sprites/msx/std00_03.png",
+     "w": 88,
+     "h": 94
+    },
+    {
+     "png": "sprites/msx/std00_04.png",
+     "w": 168,
+     "h": 76
+    }
+   ]
+  },
+  {
+   "group": "Characters",
+   "file": "STD01.BIN",
+   "pages": [
+    {
+     "png": "sprites/msx/std01_00.png",
+     "w": 252,
+     "h": 252
+    },
+    {
+     "png": "sprites/msx/std01_01.png",
+     "w": 428,
+     "h": 228
+    },
+    {
+     "png": "sprites/msx/std01_02.png",
+     "w": 512,
+     "h": 256
+    }
+   ]
+  },
+  {
+   "group": "Characters",
+   "file": "STD02.BIN",
+   "pages": [
+    {
+     "png": "sprites/msx/std02_00.png",
+     "w": 252,
+     "h": 253
+    },
+    {
+     "png": "sprites/msx/std02_01.png",
+     "w": 460,
+     "h": 248
+    },
+    {
+     "png": "sprites/msx/std02_02.png",
+     "w": 512,
+     "h": 256
+    }
+   ]
+  },
+  {
+   "group": "Characters",
+   "file": "STD03.BIN",
+   "pages": [
+    {
+     "png": "sprites/msx/std03_00.png",
+     "w": 256,
+     "h": 248
+    },
+    {
+     "png": "sprites/msx/std03_01.png",
+     "w": 352,
+     "h": 244
+    }
+   ]
+  },
+  {
+   "group": "Characters",
+   "file": "STD04.BIN",
+   "pages": [
+    {
+     "png": "sprites/msx/std04_00.png",
+     "w": 256,
+     "h": 254
+    },
+    {
+     "png": "sprites/msx/std04_01.png",
+     "w": 476,
+     "h": 247
+    },
+    {
+     "png": "sprites/msx/std04_02.png",
+     "w": 512,
+     "h": 256
+    }
+   ]
+  },
+  {
+   "group": "Mummified",
+   "file": "MUM01.BIN",
+   "pages": [
+    {
+     "png": "sprites/msx/mum01_00.png",
+     "w": 508,
+     "h": 194
+    }
+   ]
+  },
+  {
+   "group": "Mummified",
+   "file": "MUM02.BIN",
+   "pages": [
+    {
+     "png": "sprites/msx/mum02_00.png",
+     "w": 508,
+     "h": 194
+    }
+   ]
+  },
+  {
+   "group": "Mummified",
+   "file": "MUM03.BIN",
+   "pages": [
+    {
+     "png": "sprites/msx/mum03_00.png",
+     "w": 508,
+     "h": 194
+    }
+   ]
+  },
+  {
+   "group": "Mummified",
+   "file": "MUM04.BIN",
+   "pages": [
+    {
+     "png": "sprites/msx/mum04_00.png",
+     "w": 508,
+     "h": 194
+    }
+   ]
+  },
+  {
+   "group": "Fat",
+   "file": "FAT01.BIN",
+   "pages": [
+    {
+     "png": "sprites/msx/fat01_00.png",
+     "w": 760,
+     "h": 253
+    }
+   ]
+  },
+  {
+   "group": "Fat",
+   "file": "FAT02.BIN",
+   "pages": [
+    {
+     "png": "sprites/msx/fat02_00.png",
+     "w": 760,
+     "h": 253
+    }
+   ]
+  },
+  {
+   "group": "Fat",
+   "file": "FAT03.BIN",
+   "pages": [
+    {
+     "png": "sprites/msx/fat03_00.png",
+     "w": 760,
+     "h": 253
+    }
+   ]
+  },
+  {
+   "group": "Fat",
+   "file": "FAT04.BIN",
+   "pages": [
+    {
+     "png": "sprites/msx/fat04_00.png",
+     "w": 760,
+     "h": 253
+    }
+   ]
+  },
+  {
+   "group": "Vehicles",
+   "file": "_VHIECLE.BIN",
+   "pages": [
+    {
+     "png": "sprites/msx/_vhiecle_00.png",
+     "w": 512,
+     "h": 255
+    },
+    {
+     "png": "sprites/msx/_vhiecle_01.png",
+     "w": 248,
+     "h": 255
+    },
+    {
+     "png": "sprites/msx/_vhiecle_02.png",
+     "w": 252,
+     "h": 255
+    },
+    {
+     "png": "sprites/msx/_vhiecle_03.png",
+     "w": 252,
+     "h": 255
+    },
+    {
+     "png": "sprites/msx/_vhiecle_04.png",
+     "w": 252,
+     "h": 255
+    },
+    {
+     "png": "sprites/msx/_vhiecle_05.png",
+     "w": 252,
+     "h": 255
+    },
+    {
+     "png": "sprites/msx/_vhiecle_06.png",
+     "w": 256,
+     "h": 180
+    },
+    {
+     "png": "sprites/msx/_vhiecle_07.png",
+     "w": 256,
+     "h": 135
+    },
+    {
+     "png": "sprites/msx/_vhiecle_08.png",
+     "w": 256,
+     "h": 135
+    },
+    {
+     "png": "sprites/msx/_vhiecle_09.png",
+     "w": 256,
+     "h": 135
+    },
+    {
+     "png": "sprites/msx/_vhiecle_10.png",
+     "w": 256,
+     "h": 135
+    },
+    {
+     "png": "sprites/msx/_vhiecle_11.png",
+     "w": 512,
+     "h": 250
+    },
+    {
+     "png": "sprites/msx/_vhiecle_12.png",
+     "w": 252,
+     "h": 50
+    },
+    {
+     "png": "sprites/msx/_vhiecle_13.png",
+     "w": 252,
+     "h": 50
+    },
+    {
+     "png": "sprites/msx/_vhiecle_14.png",
+     "w": 252,
+     "h": 50
+    },
+    {
+     "png": "sprites/msx/_vhiecle_15.png",
+     "w": 252,
+     "h": 50
+    }
+   ]
+  }
  ]
 }

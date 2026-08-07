@@ -6,6 +6,7 @@ import { buildDialogs } from "./dialog.js";
 import { applyHash, copyLink, selectMission } from "./navigate.js";
 import { draw, exportPng, resize } from "./render.js";
 import { buildMissionBar, buildToggles } from "./sidebar.js";
+import { spriteMission } from "./model.js";
 import { buildSearch } from "./search.js";
 import { $, S, on } from "./state.js";
 
@@ -39,6 +40,8 @@ function toast(text) {
 fetch("map_data_msx.json", { cache: "no-store" })
   .then((r) => r.json())
   .then((d) => {
+    const spr = spriteMission(d);
+    if (spr) d.missions.push(spr);
     S.data = d;
     $("gameName").textContent = d.game;
     buildMissionBar();

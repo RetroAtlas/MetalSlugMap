@@ -49,11 +49,16 @@ function run(query) {
   for (const hit of hits.slice(0, 60)) {
     const b = document.createElement("button");
     const note = hit.kind === "section"
-      ? `${hit.s.pieces.length} pieces · ${hit.s.groups.length} lanes`
+      ? (hit.s.bank ? `${hit.s.bank} · ${hit.s.pieces.length} pages`
+        : `${hit.s.pieces.length} pieces · ${hit.s.groups.length} lanes`)
       : hit.kind === "object"
         ? `${hit.o.frames.length} frames · ${hit.o.tw}×${hit.o.th}`
-        : `${hit.p.tw}×${hit.p.th} tiles · lane ${hit.p.group}`;
-    b.innerHTML = `<span class="loc">${hit.m.short}</span> ${hit.label} `
+        : hit.p.page
+          ? `page ${hit.p.page} · ${hit.p.w}×${hit.p.h}px`
+          : `${hit.p.tw}×${hit.p.th} tiles · lane ${hit.p.group}`;
+    const label = hit.kind === "piece" && hit.p.page
+      ? `${hit.s.file.replace(/\.BIN$/, "")} page ${hit.p.page}` : hit.label;
+    b.innerHTML = `<span class="loc">${hit.m.short}</span> ${label} `
       + `<span class="dim">· ${note}</span>`;
     b.onclick = () => go(hit);
     box.appendChild(b);

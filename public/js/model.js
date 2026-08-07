@@ -19,6 +19,29 @@ export function sectionName(section) {
   return section.file.replace(/\.BIN$/, "");
 }
 
+/**
+ * The sprite banks, dressed as a mission so they browse like everything else.
+ *
+ * A bank is a chain of whole pages rather than an assembled stage, so its
+ * pieces carry no lane and no join — the viewer reads those as absent.
+ */
+export function spriteMission(data) {
+  const sections = (data.sprites || []).map((bank) => {
+    let y = 0;
+    const pieces = bank.pages.map((p, i) => {
+      const at = { png: p.png, w: p.w, h: p.h, art: bank.file, group: 0, x: 0, y, page: i + 1 };
+      y += p.h + GAP;
+      return at;
+    });
+    return { file: bank.file, step: bank.file.replace(/\.BIN$/, "").toLowerCase(),
+      bank: bank.group, runs: "v", groups: [{ w: 0, h: y, pieces: pieces.length }],
+      pieces, objects: [] };
+  });
+  return sections.length
+    ? { short: "SPR", name: "Sprite banks", sprites: true, sections }
+    : null;
+}
+
 /** A section's pieces at the coordinates the builder solved, plus the shelf. */
 export function layoutOf(section) {
   const stage = section.pieces.map((p) => ({ piece: p, x: p.x, y: p.y, layer: p.group }));
@@ -44,8 +67,11 @@ export function index(data) {
         m,
         s,
         label: sectionName(s),
-        hay: `${m.short} ${m.name} ${sectionName(s)} section ${s.step} `
-          + `${s.groups.length} lanes ${s.pieces.length} pieces ${s.runs === 'v' ? 'upright' : 'sideways'}`,
+        hay: s.bank
+          ? `${m.short} ${m.name} sprite bank ${s.bank} ${s.file} ${s.pieces.length} pages`
+          : `${m.short} ${m.name} ${sectionName(s)} section ${s.step} `
+            + `${s.groups.length} lanes ${s.pieces.length} pieces `
+            + `${s.runs === 'v' ? 'upright' : 'sideways'}`,
       });
       s.pieces.forEach((p, i) => {
         out.push({
@@ -54,8 +80,10 @@ export function index(data) {
           s,
           p,
           label: `${sectionName(s)} piece ${i + 1}`,
-          hay: `${m.short} ${m.name} ${sectionName(s)} piece ${i + 1} `
-            + `${p.tw}x${p.th} tiles ${p.w}x${p.h}px lane ${p.group} art ${p.art}`,
+          hay: p.page
+            ? `${m.short} sprite page ${i + 1} ${s.bank} ${s.file} ${p.w}x${p.h}px`
+            : `${m.short} ${m.name} ${sectionName(s)} piece ${i + 1} `
+              + `${p.tw}x${p.th} tiles ${p.w}x${p.h}px lane ${p.group} art ${p.art}`,
         });
       });
       s.objects.forEach((o, i) => {

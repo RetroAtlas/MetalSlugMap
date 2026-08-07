@@ -22,7 +22,7 @@ python3 tools/render_map.py --disc "/path/to/Metal Slug X.bin" --section X23_00.
 
 Which artwork a tilemap means is the hard part, because sections stream art over each other as a mission plays and nothing on the disc records what was resident when. The tools replay each mission in its load order and pick, for every piece, the point where its tiles join most smoothly — tiles cut from one picture have no seams, so the state that renders a piece cleanly is the state it was drawn under. Every piece reports the file it settled on.
 
-`tools/render_pages.py` renders the underlying pages themselves, in true colour, when you want the raw material rather than the assembled stage.
+`tools/render_pages.py` renders the underlying pages themselves, in true colour, when you want the raw material rather than the assembled stage. `tools/extract_art.py` works on any file, not just the missions — the character and vehicle banks under `\PL` and `\STD` come off the same way.
 
 ## Browsing the map
 
@@ -34,6 +34,8 @@ python3 -m http.server 8479 -d public      # then open http://localhost:8479
 ```
 
 That currently yields **219 stage pieces and 16 animated objects across all 12 missions**. Pick a mission, then a section: the builder works out whether the stage runs sideways or upright, lays its pieces along that axis in lanes, and butts them together where their edges actually match, leaving a marked break where they do not. Hover any piece to inspect it, click to pin its details, and press `?` for the shortcuts. On a touch screen, drag to pan, pinch to zoom and tap a piece for its details. Search covers sections, pieces and objects; the URL hash carries the current view, so a link reopens exactly what you were looking at.
+
+The build also lifts the **sprite banks** — the four playable characters, their mummified and fat forms, and the vehicles — which browse under `SPR` alongside the missions. These are whole sheets of every animation frame, not individual cut-outs: the assembly data that would separate the frames lives in `\PL\PAT*.BIN` and is not decoded.
 
 `--disc` can be omitted if `$METAL_SLUG_DISC` points at the image. `tools/render_map.py` writes single sections to `out/` (git-ignored) when you want the PNGs on their own.
 
