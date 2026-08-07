@@ -1,6 +1,6 @@
-// Draws the map: stage layers, the object shelf, and the overlays on top.
+// Draws the map: the assembled stage, the object shelf, and the overlays on top.
 
-import { composite, image, sectionName } from "./model.js";
+import { image, sectionName } from "./model.js";
 import { $, S, bounds } from "./state.js";
 
 const cv = $("cv");
@@ -64,26 +64,14 @@ function paint() {
   ctx.translate(-cam.x, -cam.y);
   ctx.imageSmoothingEnabled = cam.z < 1;
 
-  const deepest = S.section ? S.section.layers.length - 1 : 0;
-  const order = show.composite
-    ? [...layout].sort((a, b) => b.layer - a.layer)
-    : layout;
-
-  for (const at of order) {
+  for (const at of layout) {
     const im = image(at.piece.png, draw);
     ctx.save();
-    if (show.composite) {
-      const { scale, dy } = composite(S.section, at.layer);
-      ctx.translate(0, dy);
-      ctx.scale(scale, 1);
-    }
     if (show.dim && at.layer !== 0) ctx.globalAlpha = 0.45;
-    const x = show.composite ? at.piece.x : at.x;
-    const y = show.composite ? 0 : at.y;
-    if (im.complete && im.naturalWidth) ctx.drawImage(im, x, y);
+    if (im.complete && im.naturalWidth) ctx.drawImage(im, at.x, at.y);
     else {
       ctx.fillStyle = "#1a1d22";
-      ctx.fillRect(x, y, at.piece.w, at.piece.h);
+      ctx.fillRect(at.x, at.y, at.piece.w, at.piece.h);
     }
     ctx.restore();
   }
@@ -103,7 +91,7 @@ function paint() {
     }
   }
 
-  if (show.grid && !show.composite) outlines(deepest);
+  if (show.grid) outlines();
   if (show.objects) shelfLabels();
   marker(S.selected, css("--accent", "#e8a33d"), 2);
   marker(S.hover, "#8fd0ff", 1.5);
@@ -130,12 +118,19 @@ function outlines() {
   for (const at of S.layout) {
     ctx.strokeStyle = at.layer === 0 ? "rgba(232,163,61,.45)" : "rgba(140,150,170,.30)";
     ctx.strokeRect(at.x + px / 2, at.y + px / 2, at.piece.w - px, at.piece.h - px);
-    if (S.show.seams && !at.piece.joins && at.piece.x > 0) {
+    const upright = S.section.runs === "v";
+    const first = upright ? !at.piece.y : !at.piece.x;
+    if (S.show.seams && !at.piece.joins && !first) {
       ctx.strokeStyle = "rgba(255,120,120,.55)";
       ctx.setLineDash([6 * px, 4 * px]);
       ctx.beginPath();
-      ctx.moveTo(at.x - 8, at.y);
-      ctx.lineTo(at.x - 8, at.y + at.piece.h);
+      if (upright) {
+        ctx.moveTo(at.x, at.y - 8);
+        ctx.lineTo(at.x + at.piece.w, at.y - 8);
+      } else {
+        ctx.moveTo(at.x - 8, at.y);
+        ctx.lineTo(at.x - 8, at.y + at.piece.h);
+      }
       ctx.stroke();
       ctx.setLineDash([]);
     }

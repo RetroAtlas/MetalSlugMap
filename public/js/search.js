@@ -49,10 +49,10 @@ function run(query) {
   for (const hit of hits.slice(0, 60)) {
     const b = document.createElement("button");
     const note = hit.kind === "section"
-      ? `${hit.s.pieces.length} pieces · ${hit.s.layers.length} layers`
+      ? `${hit.s.pieces.length} pieces · ${hit.s.groups.length} lanes`
       : hit.kind === "object"
         ? `${hit.o.frames.length} frames · ${hit.o.tw}×${hit.o.th}`
-        : `${hit.p.tw}×${hit.p.th} tiles · layer ${hit.p.layer}`;
+        : `${hit.p.tw}×${hit.p.th} tiles · lane ${hit.p.group}`;
     b.innerHTML = `<span class="loc">${hit.m.short}</span> ${hit.label} `
       + `<span class="dim">· ${note}</span>`;
     b.onclick = () => go(hit);

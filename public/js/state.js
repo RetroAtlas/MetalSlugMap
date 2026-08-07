@@ -12,7 +12,6 @@ export const S = {
   show: {
     grid: true,
     labels: true,
-    composite: false,
     objects: true,
     seams: true,
     dim: false,
@@ -20,7 +19,7 @@ export const S = {
   },
 };
 
-export const GAP = 28;        // between stacked layers
+export const GAP = 28;
 export const SHELF = 56;      // between the stage and the object shelf
 
 export const $ = (id) => document.getElementById(id);

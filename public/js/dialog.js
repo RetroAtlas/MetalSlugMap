@@ -10,10 +10,9 @@ const SHORTCUTS = [
   [["/"], "search"],
   [["g"], "piece outlines"],
   [["l"], "size labels"],
-  [["p"], "composite the parallax layers"],
   [["o"], "animated objects"],
   [["s"], "mark broken joins"],
-  [["d"], "dim parallax layers"],
+  [["d"], "dim secondary lanes"],
   [["t"], "transparency checkerboard"],
   [["e"], "export the view as PNG"],
   [["?"], "this list"],
@@ -46,12 +45,15 @@ export function buildDialogs() {
     rendered at the point in the mission's load order where its tiles join most
     smoothly, which is the state it was drawn under. The <i>art state</i> shown
     for a piece is the one that won.</p>
-    <p>What is <b>not</b> here yet: where the game places these pieces relative
-    to one another, and the spawn tables for POWs, weapons and enemies. The
-    stage files hold artwork, tile lists and tilemaps and almost nothing else,
-    so that data lives somewhere still unidentified. Pieces are laid out in the
-    order their file holds them, butted together where their edges actually
-    match and separated where they do not — a broken join is drawn, not hidden.</p>
+    <p>Nothing on the disc says where a chunk of stage sits, so the arrangement
+    is measured too. Chunks cut from one picture still meet cleanly, and
+    counting which way they meet tells a street that scrolls sideways from a
+    pyramid interior that climbs: pieces run along that axis in the order their
+    file holds them, butted together where their edges match and separated by a
+    marked break where they do not. A break is drawn, not hidden.</p>
+    <p>There are no spawn tables to add later. Metal Slug X compiles object
+    placement into per-stage code rather than storing it, so POWs, weapons and
+    enemies cannot be lifted the way this map's artwork was.</p>
     <p>Sister project to <a href="https://oddworldmap.com/" target="_blank"
     rel="noopener">Oddworld Map</a>.</p>`;
 

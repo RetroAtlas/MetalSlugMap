@@ -35,23 +35,31 @@ MISSIONS = [
 JOIN = 8.0      # seam cost under which two pieces are one strip of stage
 BREAK = 32      # pixels left between strips that do not join
 FRAMES = 0.6    # cell agreement above which two pieces are frames of one object
+UPRIGHT = 2.0   # how far vertical joins must outweigh horizontal to call a stage upright
 
 
 def edge(vram, piece, side):
-    """The colours down one vertical edge of a piece; side 0 left, 1 right."""
+    """The colours along one edge of a piece: 'l', 'r', 't' or 'b'."""
     w, h, tiles, cells = piece["w"], piece["h"], piece["tiles"], piece["cells"]
-    cx = 0 if side == 0 else w - 1
-    tx = 0 if side == 0 else TILE - 1
     out = []
-    for cy in range(h):
-        t = cells[cy * w + cx]
-        if t >= len(tiles):
-            out += [0] * TILE
-            continue
-        r = tiles[t]
-        for ty in range(TILE):
-            i = vram.texel4(r["page_x"], r["page_y"], r["x"] + tx, r["y"] + ty)
-            out.append(vram.clut_colour(r["clut"], i) if i else 0)
+
+    def texel(cell, tx, ty):
+        if cell >= len(tiles):
+            return 0
+        r = tiles[cell]
+        i = vram.texel4(r["page_x"], r["page_y"], r["x"] + tx, r["y"] + ty)
+        return vram.clut_colour(r["clut"], i) if i else 0
+
+    if side in "lr":
+        cx, tx = (0, 0) if side == "l" else (w - 1, TILE - 1)
+        for cy in range(h):
+            for ty in range(TILE):
+                out.append(texel(cells[cy * w + cx], tx, ty))
+    else:
+        cy, ty = (0, 0) if side == "t" else (h - 1, TILE - 1)
+        for cx in range(w):
+            for tx in range(TILE):
+                out.append(texel(cells[cy * w + cx], tx, ty))
     return out
 
 
@@ -80,6 +88,69 @@ def frames_of(a, b):
         return 0.0
     same = sum(1 for x, y in zip(a["cells"], b["cells"]) if x == y)
     return same / len(a["cells"])
+
+
+def orientation(shot, live):
+    """Which way this section's stage runs, decided by which edges actually meet.
+
+    A street scrolls sideways and its chunks meet left to right; a pyramid
+    interior scrolls upward and its chunks meet top to bottom. Counting the
+    joins each direction affords tells the two apart — the pyramid offers
+    dozens of vertical matches and no horizontal one.
+
+    Sideways is the default and has to be beaten clearly, because a section of
+    narrow same-width chunks throws off vertical matches whichever way it runs.
+    """
+    across = down = 0
+    for i in live:
+        for j in live:
+            if i == j:
+                continue
+            a, b = shot[i], shot[j]
+            if a["h"] == b["h"]:
+                c = seam(a["r"], b["l"])
+                across += c is not None and c < JOIN
+            if a["w"] == b["w"]:
+                c = seam(a["b"], b["t"])
+                down += c is not None and c < JOIN
+    return "v" if down > across * UPRIGHT else "h"
+
+
+def assemble(shot, live, way):
+    """Lay the stage pieces out along the axis the section runs on.
+
+    Pieces that share the cross-axis size are one lane and run in file order,
+    butted together where their facing edges meet and pushed apart where they
+    do not. Order within a lane stays file order rather than the cheapest seam:
+    a section's repeated wall chunks all match each other equally well, so the
+    seams say a lane exists without saying how it is sequenced.
+
+    Returns {index: (x, y, lane, joins)}.
+    """
+    lanes = defaultdict(list)
+    for k in live:
+        lanes[shot[k]["h"] if way == "h" else shot[k]["w"]].append(k)
+    order = sorted(lanes.values(),
+                   key=lambda ks: -sum(shot[k]["w" if way == "h" else "h"] for k in ks))
+
+    out = {}
+    cross = 0
+    for lane, ks in enumerate(order):
+        run = 0
+        prev = None
+        for k in ks:
+            s = shot[k]
+            cost = None if prev is None else seam(
+                *((shot[prev]["r"], s["l"]) if way == "h" else (shot[prev]["b"], s["t"])))
+            joins = cost is not None and cost < JOIN
+            if prev is not None and not joins:
+                run += BREAK
+            out[k] = ((run, cross) if way == "h" else (cross, run)) + (lane, joins)
+            run += s["w"] if way == "h" else s["h"]
+            prev = k
+        cross += (max(shot[k]["h"] for k in ks) if way == "h"
+                  else max(shot[k]["w"] for k in ks)) + BREAK
+    return out
 
 
 def group(ps):
@@ -139,11 +210,11 @@ def main():
                 rel = f"pieces/msx/{stem}_{i:02d}.png"
                 write_png(out / rel, W, H, img, keep_alpha=True)
                 shot.append(dict(png=rel, w=W, h=H, tw=p["w"], th=p["h"], art=art,
-                                 fit=round(fit, 1), left=edge(vram, p, 0),
-                                 right=edge(vram, p, 1)))
+                                 fit=round(fit, 1),
+                                 **{s: edge(vram, p, s) for s in "lrtb"}))
 
             sec = {"file": name, "step": name[len(short) + 1:-4],
-                   "layers": [], "pieces": [], "objects": []}
+                   "groups": [], "pieces": [], "objects": []}
             stage_pieces = []
             for a, b, animated in group(ps):
                 live = [k for k in range(a, b) if shot[k]]
@@ -158,36 +229,27 @@ def main():
                 else:
                     stage_pieces += live
 
-            by_height = defaultdict(list)
-            for k in stage_pieces:
-                by_height[ps[k]["h"]].append(k)
-            # a layer is every stage piece of one height, in the order the file
-            # holds them; layers run widest first, the widest being the ground
-            # the player walks and the narrower ones the parallax behind it
-            layers = sorted(by_height.values(),
-                            key=lambda ks: -sum(shot[k]["w"] for k in ks))
-            for depth, ks in enumerate(layers):
-                x = 0
-                width = 0
-                prev = None
-                for k in ks:
-                    s = shot[k]
-                    cost = seam(prev["right"], s["left"]) if prev is not None else None
-                    joins = cost is not None and cost < JOIN
-                    if prev is not None and not joins:
-                        x += BREAK
-                    sec["pieces"].append({"png": s["png"], "w": s["w"], "h": s["h"],
-                                          "tw": s["tw"], "th": s["th"], "art": s["art"],
-                                          "fit": s["fit"], "layer": depth,
-                                          "x": x, "joins": joins})
-                    x += s["w"]
-                    width = x
-                    prev = s
-                sec["layers"].append({"h": shot[ks[0]]["h"], "w": width})
+            way = orientation(shot, stage_pieces) if stage_pieces else "h"
+            placed = assemble(shot, stage_pieces, way)
+            sec["runs"] = way
+            spans = defaultdict(lambda: [0, 0])
+            for k, (x, y, lane, _) in placed.items():
+                spans[lane][0] = max(spans[lane][0], x + shot[k]["w"])
+                spans[lane][1] = max(spans[lane][1], y + shot[k]["h"])
+            for lane in sorted(spans):
+                sec["groups"].append({"w": spans[lane][0], "h": spans[lane][1],
+                                      "pieces": sum(1 for v in placed.values() if v[2] == lane)})
+            for k in sorted(placed, key=lambda k: (placed[k][2], placed[k][1], placed[k][0])):
+                x, y, lane, joins = placed[k]
+                s = shot[k]
+                sec["pieces"].append({"png": s["png"], "w": s["w"], "h": s["h"],
+                                      "tw": s["tw"], "th": s["th"], "art": s["art"],
+                                      "fit": s["fit"], "group": lane,
+                                      "x": x, "y": y, "joins": joins})
             if sec["pieces"] or sec["objects"]:
                 entry["sections"].append(sec)
                 print(f"  {name}: {len(sec['pieces'])} pieces, "
-                      f"{len(sec['objects'])} objects, {len(sec['layers'])} layers", flush=True)
+                      f"{len(sec['objects'])} objects, {len(sec['groups'])} groups", flush=True)
         if entry["sections"]:
             data["missions"].append(entry)
             print(f"{short} ({display}): {len(entry['sections'])} sections", flush=True)

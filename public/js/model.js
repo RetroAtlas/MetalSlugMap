@@ -19,40 +19,20 @@ export function sectionName(section) {
   return section.file.replace(/\.BIN$/, "");
 }
 
-/** Every layer of a section, its pieces already placed left to right. */
+/** A section's pieces at the coordinates the builder solved, plus the shelf. */
 export function layoutOf(section) {
-  const stage = [];
-  let y = 0;
-  section.layers.forEach((layer, depth) => {
-    for (const p of section.pieces) {
-      if (p.layer === depth) stage.push({ piece: p, x: p.x, y, layer: depth });
-    }
-    y += layer.h + GAP;
-  });
+  const stage = section.pieces.map((p) => ({ piece: p, x: p.x, y: p.y, layer: p.group }));
 
+  let bottom = 0;
+  for (const a of stage) bottom = Math.max(bottom, a.y + a.piece.h);
   const shelf = [];
   let sx = 0;
-  const top = y + SHELF;
+  const top = bottom + SHELF;
   for (const o of section.objects) {
     shelf.push({ piece: o, x: sx, y: top, object: true });
-    sx += o.w + 24;
+    sx += o.w + GAP;
   }
   return { stage, shelf };
-}
-
-/**
- * Where a background layer sits when layers are composited rather than stacked.
- *
- * A shorter layer covers the same stage in fewer pixels because it scrolls
- * slower, so stretching it back over the widest layer puts each of its pixels
- * at the place in the stage you actually see it, and the layers line up on the
- * ground rather than floating at their own tops.
- */
-export function composite(section, depth) {
-  const wide = Math.max(...section.layers.map((l) => l.w), 1);
-  const tall = Math.max(...section.layers.map((l) => l.h), 1);
-  const layer = section.layers[depth];
-  return { scale: wide / (layer.w || 1), dy: tall - layer.h };
 }
 
 export function index(data) {
@@ -65,7 +45,7 @@ export function index(data) {
         s,
         label: sectionName(s),
         hay: `${m.short} ${m.name} ${sectionName(s)} section ${s.step} `
-          + `${s.layers.length} layers ${s.pieces.length} pieces`,
+          + `${s.groups.length} lanes ${s.pieces.length} pieces ${s.runs === 'v' ? 'upright' : 'sideways'}`,
       });
       s.pieces.forEach((p, i) => {
         out.push({
@@ -75,7 +55,7 @@ export function index(data) {
           p,
           label: `${sectionName(s)} piece ${i + 1}`,
           hay: `${m.short} ${m.name} ${sectionName(s)} piece ${i + 1} `
-            + `${p.tw}x${p.th} tiles ${p.w}x${p.h}px layer ${p.layer} art ${p.art}`,
+            + `${p.tw}x${p.th} tiles ${p.w}x${p.h}px lane ${p.group} art ${p.art}`,
         });
       });
       s.objects.forEach((o, i) => {
@@ -108,10 +88,6 @@ export function stats(data) {
     }
   }
   return { missions: data.missions.length, sections, pieces, objects, frames };
-}
-
-export function extent(section) {
-  return Math.max(...section.layers.map((l) => l.w), 0);
 }
 
 export function pieceAt(wx, wy) {

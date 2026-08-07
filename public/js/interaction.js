@@ -92,7 +92,7 @@ cv.addEventListener("pointermove", (e) => {
 });
 
 function showTip(at, sx, sy) {
-  if (!at || S.show.composite) {
+  if (!at) {
     tip.hidden = true;
     return;
   }
@@ -105,9 +105,9 @@ function showTip(at, sx, sy) {
       ["art", p.art],
     ]
     : [
-      ["layer", p.layer === 0 ? "0 — playfield" : `${p.layer} — parallax`],
+      ["lane", p.group === 0 ? "0 — main" : `${p.group}`],
       ["size", `${p.tw}×${p.th} tiles · ${p.w}×${p.h}px`],
-      ["at x", `${p.x}px`],
+      ["at", `${p.x}, ${p.y}`],
       ["joins left", p.joins ? "yes" : "no — separate strip"],
       ["art", `${p.art} (fit ${p.fit})`],
     ];
@@ -170,7 +170,7 @@ function zoomAt(sx, sy, factor) {
 }
 
 const TOGGLES = {
-  g: "grid", l: "labels", p: "composite", o: "objects",
+  g: "grid", l: "labels", o: "objects",
   s: "seams", d: "dim", t: "checker",
 };
 

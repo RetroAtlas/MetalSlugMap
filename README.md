@@ -2,7 +2,7 @@
 
 An in-progress interactive map of the Metal Slug games on PlayStation, extracted straight from the game discs — starting with **Metal Slug X** (NTSC-U). Sister project to [Oddworld Map](https://oddworldmap.com/); same idea, a much harder game to extract.
 
-**Status: usable.** Every stage piece in the game comes off the disc in its true colours and is browsable in the viewer. What is still open is *placement* — where the game puts those pieces relative to one another. Object spawns are not open but closed: they are compiled into per-sub-stage code overlays rather than stored in any table, so there is nothing to extract.
+**Status: usable.** Every stage piece in the game comes off the disc in its true colours, assembled along the axis its stage runs on, and browsable in the viewer. The two things the disc does not record — how far apart chunks sit, and where objects spawn — are answered as far as they can be: spacing is recovered by matching edges, and object placement turns out to be compiled into per-sub-stage code rather than stored, so there is nothing to extract.
 
 ## What works now
 
@@ -33,7 +33,7 @@ python3 tools/build_map.py --disc "/path/to/Metal Slug X.bin"
 python3 -m http.server 8479 -d public      # then open http://localhost:8479
 ```
 
-That currently yields **219 stage pieces and 16 animated objects across all 12 missions**. Pick a mission, then a section: pieces of the same height are one layer of the stage and lay out left to right, butted together where their edges actually match and separated by a marked break where they do not. Hover any piece to inspect it, click to pin its details, and press `?` for the shortcuts. On a touch screen, drag to pan, pinch to zoom and tap a piece for its details. Search covers sections, pieces and objects; the URL hash carries the current view, so a link reopens exactly what you were looking at.
+That currently yields **219 stage pieces and 16 animated objects across all 12 missions**. Pick a mission, then a section: the builder works out whether the stage runs sideways or upright, lays its pieces along that axis in lanes, and butts them together where their edges actually match, leaving a marked break where they do not. Hover any piece to inspect it, click to pin its details, and press `?` for the shortcuts. On a touch screen, drag to pan, pinch to zoom and tap a piece for its details. Search covers sections, pieces and objects; the URL hash carries the current view, so a link reopens exactly what you were looking at.
 
 `--disc` can be omitted if `$METAL_SLUG_DISC` points at the image. `tools/render_map.py` writes single sections to `out/` (git-ignored) when you want the PNGs on their own.
 
@@ -46,7 +46,7 @@ The map is being built as a **hybrid**, so there is something usable at every st
 3. **Stage layout** — done: tilemaps place tiles into stage sections, and each section renders end to end.
 4. **Viewer** — browse by mission and section, pan and zoom, hover to inspect, click for details, toggle layers and overlays, export a view, search across sections, pieces and objects, and share any view by URL.
 5. **Streaming order** — done: a section's number is a path through the stage, so sorting those numbers gives the order the game loads them, and each piece is rendered against the memory state where its tiles join. This is what took the artwork from plausible-looking mosaics to the real stages.
-6. **Piece placement** — open. The stage is a library of tilemap chunks and their arrangement is not in the section files, so the builder only joins two pieces where their facing edges actually match and marks the joins it cannot make. Runs that do join come out as real strips of stage.
+6. **Piece placement** — done as far as the disc allows. The arrangement is not stored anywhere, so it is measured: chunks cut from one picture still meet cleanly, and counting which way they meet tells a street that scrolls sideways from a pyramid interior that climbs. Pieces run along that axis, butted together where their edges match and separated by a marked break where they do not.
 7. **Spawn tables** — answered, and the answer is that there are none. The last unidentified files on the disc, the per-sub-stage `ST*` family, turned out to be MIPS code: every one of them is an overlay of object behaviour, confirmed by disassembling it at the load address the executable's own asset manifest gives. Metal Slug X places its objects in compiled code, not in a table, so POWs, items and enemies cannot be lifted the way Oddworld's TLVs were. See [CLAUDE.md](CLAUDE.md) for the test that settles it.
 
 Unlike Oddworld — where a community decompilation ([alive_reversing](https://github.com/AliveTeam/alive_reversing)) handed us every structure — Metal Slug X has no such reference; the only ground truth is the disc and the game executable.

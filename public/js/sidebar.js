@@ -7,11 +7,11 @@ import { $, S, emit, on } from "./state.js";
 
 const LABELS = {
   grid: "Piece outlines", labels: "Size labels (zoomed)",
-  composite: "Composite layers (parallax)", objects: "Animated objects",
-  seams: "Mark broken joins", dim: "Dim parallax layers",
+  objects: "Animated objects",
+  seams: "Mark broken joins", dim: "Dim secondary lanes",
   checker: "Transparency checkerboard",
 };
-const KEYS = { grid: "g", labels: "l", composite: "p", objects: "o", seams: "s", dim: "d", checker: "t" };
+const KEYS = { grid: "g", labels: "l", objects: "o", seams: "s", dim: "d", checker: "t" };
 
 export function buildMissionBar() {
   const bar = $("missionBtns");
@@ -64,7 +64,7 @@ on("mission-changed", (m) => {
   for (const s of m.sections) {
     const b = document.createElement("button");
     b.textContent = s.step;
-    b.title = `${s.file} — ${s.pieces.length} pieces, ${s.layers.length} layers`;
+    b.title = `${s.file} — ${s.pieces.length} pieces, ${s.groups.length} lanes`;
     b.dataset.key = s.file;
     b.onclick = () => selectSection(s);
     bar.appendChild(b);
@@ -77,7 +77,7 @@ on("section-changed", (s) => {
   list.innerHTML = "";
   S.layout.forEach((at, i) => {
     const b = document.createElement("button");
-    const tag = at.piece.layer === 0 ? "playfield" : `layer ${at.piece.layer}`;
+    const tag = at.piece.group === 0 ? "main lane" : `lane ${at.piece.group}`;
     const join = at.piece.joins || !at.piece.x ? "" : " · break";
     b.innerHTML = `${i + 1}. <span class="dim">${at.piece.tw}×${at.piece.th} tiles · ${tag}${join}</span>`;
     b.dataset.key = at.piece.png;
@@ -112,9 +112,9 @@ on("selection-changed", (at) => {
   const rows = at.object
     ? [["Kind", "Animated object"], ["Frames", p.frames.length],
       ["Tiles", `${p.tw}×${p.th}`], ["Pixels", `${p.w}×${p.h}`], ["Art state", p.art]]
-    : [["Layer", p.layer === 0 ? "0 — playfield" : `${p.layer} — parallax`],
+    : [["Lane", p.group === 0 ? "0 — main" : `${p.group}`],
       ["Tiles", `${p.tw}×${p.th}`], ["Pixels", `${p.w}×${p.h}`],
-      ["Position", `x ${p.x}`], ["Joins left", p.joins ? "yes" : "no"],
+      ["Position", `${p.x}, ${p.y}`], ["Joins", p.joins ? "yes" : "no"],
       ["Art state", `${p.art} · fit ${p.fit}`]];
   panel.innerHTML = `<h3>${sectionName(S.section)}</h3>`
     + rows.map(([k, v]) => `<div class="pp-row"><span>${k}</span><b>${v}</b></div>`).join("");
