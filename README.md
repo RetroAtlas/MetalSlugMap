@@ -47,7 +47,7 @@ The map is being built as a **hybrid**, so there is something usable at every st
 4. **Viewer** — browse by mission and section, pan and zoom, hover to inspect, click for details, toggle layers and overlays, export a view, search across sections, pieces and objects, and share any view by URL.
 5. **Streaming order** — done: a section's number is a path through the stage, so sorting those numbers gives the order the game loads them, and each piece is rendered against the memory state where its tiles join. This is what took the artwork from plausible-looking mosaics to the real stages.
 6. **Piece placement** — open. The stage is a library of tilemap chunks and their arrangement is not in the section files, so the builder only joins two pieces where their facing edges actually match and marks the joins it cannot make. Runs that do join come out as real strips of stage.
-7. **Spawn tables** — open, and the least documented. POWs, items, hidden objects and branch triggers are not in the stage files; `MISS<nn>.BIN` turned out to be Combat School rather than the main missions. See [CLAUDE.md](CLAUDE.md) for what has been ruled out and which files are still worth opening.
+7. **Spawn tables** — open, and the least documented. POWs, items, hidden objects and branch triggers are not in the stage files, not marked in the tilemaps, and not in the per-section code overlays, which turn out to be single objects' behaviour. The live lead is a per-sub-stage file family (`ST01`, `ST02A/B/C`, `ST03A`, `ST05A/B/C`) that nothing else on the disc points at. See [CLAUDE.md](CLAUDE.md) for what has been ruled out and how.
 
 Unlike Oddworld — where a community decompilation ([alive_reversing](https://github.com/AliveTeam/alive_reversing)) handed us every structure — Metal Slug X has no such reference; the only ground truth is the disc and the game executable.
 
@@ -64,6 +64,7 @@ Unlike Oddworld — where a community decompilation ([alive_reversing](https://g
 - `tools/section.py` — finds a file's tile lists and tilemaps, and replays a mission's video memory in load order.
 - `tools/render.py` — draws a piece, and scores how well it came out so the right memory state can be chosen.
 - `tools/render_map.py` — CLI that renders one section's pieces.
+- `tools/mips.py` — MIPS disassembler for the executable and the section code overlays.
 - `tools/build_map.py` — CLI that renders every piece in the game and emits the viewer's data.
 - `public/` — the viewer: `index.html`, `css/main.css`, the ES modules under `js/`, plus the generated `map_data_msx.json` and `pieces/msx/`.
 
