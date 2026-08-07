@@ -120,6 +120,7 @@ body.page-zoomed #cv { touch-action: pinch-zoom; }
   padding: 6px 8px; font-size: 11px; display: grid; grid-template-columns: auto auto;
   gap: 2px 10px; box-shadow: 0 6px 20px rgba(0, 0, 0, .5);
 }
+#tip[hidden] { display: none; }   /* an id's display beats the [hidden] default */
 #tip b { color: var(--dim); font-weight: 400; }
 #tip span { color: var(--text); text-align: right; }
 

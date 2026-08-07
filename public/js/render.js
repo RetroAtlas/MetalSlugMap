@@ -110,11 +110,19 @@ function paint() {
   ctx.restore();
 
   hud();
-  if (S.show.objects && objects.length) draw.timer ||= setTimeout(() => {
-    draw.timer = null;
-    draw();
-  }, 180);
+  // the object shelf animates, so it drives its own frames; a hidden tab has
+  // nobody watching them
+  if (show.objects && objects.length && !document.hidden && !animating) {
+    animating = setTimeout(() => {
+      animating = null;
+      draw();
+    }, 180);
+  }
 }
+let animating = null;
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) draw();
+});
 
 function outlines() {
   const px = 1 / S.cam.z;
