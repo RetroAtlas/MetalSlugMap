@@ -1,18 +1,17 @@
 #!/usr/bin/env python3
-"""Extract the raw TIM texture pages from Metal Slug X mission files to PNG.
+"""Extract the TIM texture pages from any Metal Slug X file to PNG.
 
-This is the proven first capability: stage artwork is stored uncompressed as
-standard PS1 TIM pages, so it comes straight off the disc. The tilemap that
-assembles these tiles into full scrolling stages, and the spawn tables for
-POWs / items / hidden objects, are a separate reverse-engineering task (see
-README) — this tool only lifts the art.
+Artwork is stored uncompressed as standard PS1 TIM pages, so it comes straight
+off the disc — not only the mission files but the character and vehicle banks
+under `\\PL` and `\\STD` too.
 
 Usage:
     python3 tools/extract_art.py --disc "Metal Slug X.bin" [--file X1.BIN] [--out out]
 
 --disc defaults to $METAL_SLUG_DISC. With no --file, every X*.BIN mission file
-is scanned. Each texture page is written with palette 0; real per-tile palette
-selection comes with tilemap decoding.
+is scanned. Each page is written under the first palette its record carries;
+tiles pick their own palette out of that bank, which is what the tilemap tools
+resolve.
 """
 import argparse
 import os
@@ -22,12 +21,36 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from disc import Disc
 from png import write_png
-from tim import find_tims
+from vram import rgba, tim_records
 
 
 def mission_files(disc):
     return sorted(n for n in disc.files
                   if n.startswith("X") and n.endswith(".BIN") and n[1:-4].isdigit())
+
+
+def page(record):
+    """Unpack one record to (width, height, RGBA) under the palette it carries."""
+    blob, w, h = record["pixels"], record["w"], record["h"]
+    per = {0: 4, 1: 2, 2: 1}[record["mode"]]
+    clut = record["clut"]
+    palette = []
+    if clut:
+        palette = [clut[4][i * 2] | (clut[4][i * 2 + 1] << 8) for i in range(clut[2])]
+    out = bytearray(w * per * h * 4)
+    for y in range(h):
+        for x in range(w):
+            word = blob[(y * w + x) * 2] | (blob[(y * w + x) * 2 + 1] << 8)
+            for s in range(per):
+                if record["mode"] == 2:
+                    colour = word
+                else:
+                    bits = 4 if per == 4 else 8
+                    index = (word >> (s * bits)) & ((1 << bits) - 1)
+                    colour = palette[index] if index < len(palette) else 0
+                o = (y * w * per + x * per + s) * 4
+                out[o:o + 4] = bytes(rgba(colour))
+    return w * per, h, bytes(out)
 
 
 def main():
@@ -53,10 +76,11 @@ def main():
             continue
         data = disc.read_file(name)
         stem = name[:-4].lower()
-        pages = list(find_tims(data))
-        for i, tim in enumerate(pages):
-            path = out / f"{stem}_{i:02d}_{tim['width']}x{tim['height']}.png"
-            write_png(path, tim["width"], tim["height"], tim["rgba"], keep_alpha=True)
+        pages = tim_records(data)
+        for i, record in enumerate(pages):
+            w, h, pixels = page(record)
+            path = out / f"{stem}_{i:02d}_{w}x{h}.png"
+            write_png(path, w, h, pixels, keep_alpha=True)
         print(f"{name}: {len(pages)} texture page(s) -> {stem}_*.png")
         total += len(pages)
     print(f"\n{total} texture pages written to {out}/")
