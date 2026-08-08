@@ -37,6 +37,7 @@ class Cpu:
         self.traps = {}        # address -> fn(cpu); a trapped call returns to $ra
         self.steps = 0
         self.limit = 20_000_000
+        self.trace = None      # set to a deque to keep the last addresses executed
 
     # ---- memory ---------------------------------------------------------
     def _view(self, addr):
@@ -95,13 +96,21 @@ class Cpu:
                 return
             fn = self.traps.get(pc)
             if fn is not None:
+                self.pc_trap = pc
                 fn(self)
                 pc = self.r[31]
                 delay = None
                 continue
+            if pc < 0x80:
+                # a call through an uninitialised pointer; walking up through
+                # zeroed memory would otherwise reach a kernel vector and look
+                # like a real call
+                raise Halt(f"jump to null (0x{pc:08x}) from 0x{self.r[31]:08x}")
             self.steps += 1
             if self.steps > self.limit:
                 raise Halt(f"step limit at 0x{pc:08x}")
+            if self.trace is not None:
+                self.trace.append(pc)
             word = self.read(pc, 4)
             target = self.step(word, pc)
             if delay is not None:

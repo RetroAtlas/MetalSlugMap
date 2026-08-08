@@ -68,6 +68,8 @@ Unlike Oddworld — where a community decompilation ([alive_reversing](https://g
 - `tools/render_map.py` — CLI that renders one section's pieces.
 - `tools/mips.py` — MIPS disassembler for the executable and the code overlays.
 - `tools/manifest.py` — dumps the executable's asset manifest: every file's load address, and whether it is code.
+- `tools/cpu.py` — an R3000A interpreter, so the game's own placement code can be run rather than read.
+- `tools/machine.py` — sets that up as a machine: kernel stubs, the disc answered from the manifest, and the actor pool.
 - `tools/build_map.py` — CLI that renders every piece in the game and emits the viewer's data.
 - `public/` — the viewer: `index.html`, `css/main.css`, the ES modules under `js/`, plus the generated `map_data_msx.json` and `pieces/msx/`.
 
