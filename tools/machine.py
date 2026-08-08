@@ -30,6 +30,11 @@ MAIN = 0x8001255c
 # Answering success at the library's own entry points keeps the game moving; the
 # file requests it really cares about arrive at CD_LOAD, which is served in full.
 CD_STUBS = (0x80061cf8, 0x80071354, 0x800715c4)
+
+STAGE_START = 0x80013280    # sets a stage up; takes its index from PICK_STAGE
+PICK_STAGE = 0x800529b0     # trap this to choose one of the sub-stage table's entries
+FRAME_LOOP = 0x800152e8     # walks the actor lists and calls each handler
+FRAME_WAIT = 0x800706e8     # polls a byte only an interrupt would set
 BSS, BSS_END = 0x800c9a50, 0x800fa6b0    # the range the start-up code clears
 
 # The game reaches the kernel the way every PlayStation title does, by jumping to
@@ -178,6 +183,25 @@ class Machine:
         cpu.r[28] = 0x80010000      # $gp, as the start-up code sets it
         cpu.r[29] = cpu.r[30] = 0x801FFF00
         return MAIN
+
+    def start_stage(self, index):
+        """Run the game's own initialisation, then start one sub-stage.
+
+        `main` has to run for its init — it installs callbacks the frame code
+        calls straight through — but not for its loop, so the loop is answered
+        instead of entered. The same goes for the frame wait, which polls a byte
+        that only an interrupt would ever set.
+        """
+        cpu = self.cpu
+        self.boot()
+        done = lambda c: c.r.__setitem__(2, 0)
+        cpu.traps[FRAME_LOOP] = done
+        cpu.traps[FRAME_WAIT] = done
+        cpu.call(MAIN)
+        del cpu.traps[FRAME_LOOP]
+        cpu.traps[PICK_STAGE] = lambda c: c.r.__setitem__(2, index)
+        cpu.call(STAGE_START)
+        return cpu.read(0x800edb30, 2), cpu.read(0x800edb5c, 2)
 
     def index_of(self, name):
         for i, e in self.manifest.items():
