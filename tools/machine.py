@@ -24,11 +24,23 @@ CURRENT_ACTOR = 0x800c9a98
 FREE_LIST = 0x800c9a94
 FREE_COUNT = 0x800d41fc
 ACTOR_SIZE = 332
+MAIN = 0x8001255c
+
+# The disc driver polls hardware that is not here and times out, over and over.
+# Answering success at the library's own entry points keeps the game moving; the
+# file requests it really cares about arrive at CD_LOAD, which is served in full.
+CD_STUBS = (0x80061cf8, 0x80071354, 0x800715c4)
+BSS, BSS_END = 0x800c9a50, 0x800fa6b0    # the range the start-up code clears
 
 # The game reaches the kernel the way every PlayStation title does, by jumping to
 # a vector with the function number in $t1. Only the memory and string calls have
 # to do anything real; the rest exist so the caller gets an answer and continues.
 BIOS_VECTORS = (0xA0, 0xB0, 0xC0)
+
+GPUSTAT = 0x1F801814
+# bits 26-28 are the "ready" flags the drawing code waits on; without them set
+# the game spins forever on a graphics chip that is never going to answer
+GPU_READY = 0x1C000000
 
 
 def _bios_a(cpu, fn):
@@ -77,6 +89,10 @@ class Machine:
         self.spawned = []
         self.kernel = {}        # (vector, fn) -> times called, so gaps are visible
         self.cpu.traps[CD_LOAD] = self._cd_load
+        for addr in CD_STUBS:
+            self.cpu.traps[addr] = self._cd_ok
+        self.cpu.on_syscall = self._syscall
+        self.cpu.io_read = self._io_read
         for vector in BIOS_VECTORS:
             self.cpu.traps[vector] = self._bios
 
@@ -86,6 +102,19 @@ class Machine:
         fn = cpu.r[9]
         self.kernel[(vector, fn)] = self.kernel.get((vector, fn), 0) + 1
         cpu.r[2] = _bios_a(cpu, fn) if vector == 0xA0 else 0
+
+    def _io_read(self, addr, size):
+        return GPU_READY if (addr & 0x1FFFFFFF) == GPUSTAT else 0
+
+    def _syscall(self, cpu):
+        # 1 enters a critical section, 2 leaves one; the answer to the first is
+        # whether interrupts had been enabled, and nothing here has any
+        self.kernel[("syscall", cpu.r[4])] = self.kernel.get(("syscall", cpu.r[4]), 0) + 1
+        cpu.r[2] = 1 if cpu.r[4] == 1 else 0
+
+    def _cd_ok(self, cpu):
+        self.kernel[("cd", cpu.pc_trap)] = self.kernel.get(("cd", cpu.pc_trap), 0) + 1
+        cpu.r[2] = 1
 
     def _cd_load(self, cpu):
         entry = cpu.r[4]
@@ -113,6 +142,21 @@ class Machine:
             cpu.r[2] = got
             cpu.r[31] = ra
         self.cpu.traps[ACTOR_NEW] = trap
+
+    def boot(self):
+        """Do the start-up code's own job, then hand back with main() ready.
+
+        Running the real crt0 is not worth it — its static-initialiser loop
+        returns through a register the loop itself clobbers — and everything it
+        does that matters is a few lines here: clear the zero-initialised data,
+        point the globals register where the code expects it, and put the stack
+        somewhere sane.
+        """
+        cpu = self.cpu
+        cpu.load(BSS, bytes(BSS_END - BSS))
+        cpu.r[28] = 0x80010000      # $gp, as the start-up code sets it
+        cpu.r[29] = cpu.r[30] = 0x801FFF00
+        return MAIN
 
     def index_of(self, name):
         for i, e in self.manifest.items():

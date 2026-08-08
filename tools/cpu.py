@@ -32,12 +32,15 @@ class Cpu:
         self.ram = bytearray(RAM_SIZE)
         self.scratch = bytearray(1024)
         self.r = [0] * 32
+        self.cop2 = [0] * 64
         self.hi = self.lo = 0
         self.pc = 0
         self.traps = {}        # address -> fn(cpu); a trapped call returns to $ra
         self.steps = 0
         self.limit = 20_000_000
         self.trace = None      # set to a deque to keep the last addresses executed
+        self.on_syscall = None
+        self.io_read = None    # hardware registers; without one they read zero
 
     # ---- memory ---------------------------------------------------------
     def _view(self, addr):
@@ -51,7 +54,7 @@ class Cpu:
     def read(self, addr, size):
         buf, off = self._view(addr)
         if buf is None:
-            return 0
+            return self.io_read(addr, size) if self.io_read else 0
         if size == 1:
             return buf[off]
         if size == 2:
@@ -145,7 +148,11 @@ class Cpu:
             elif funct == 0x09:
                 r[rd] = pc + 8
                 return r[rs]
-            elif funct in (0x0c, 0x0d): raise Halt(f"syscall/break at 0x{pc:08x}")
+            elif funct == 0x0c:
+                if self.on_syscall is None:
+                    raise Halt(f"syscall at 0x{pc:08x}")
+                self.on_syscall(self)
+            elif funct == 0x0d: raise Halt(f"break at 0x{pc:08x}")
             elif funct == 0x10: r[rd] = self.hi
             elif funct == 0x11: self.hi = r[rs]
             elif funct == 0x12: r[rd] = self.lo
@@ -203,6 +210,18 @@ class Cpu:
         elif op == 0x0f: r[rt] = (imm << 16) & M
         elif op == 0x10:                       # cop0: status and cause only
             r[rt] = 0 if rs == 0 else r[rt]
+        elif op == 0x12:
+            # The geometry coprocessor only ever feeds drawing here, so its
+            # registers are kept and its arithmetic is skipped: placement code
+            # reads coordinates out of memory, never out of the GTE.
+            if word & (1 << 25):
+                pass
+            elif rs == 0: r[rt] = self.cop2[rd]
+            elif rs == 2: r[rt] = self.cop2[32 + rd]
+            elif rs == 4: self.cop2[rd] = r[rt]
+            elif rs == 6: self.cop2[32 + rd] = r[rt]
+        elif op == 0x32: self.cop2[rt] = self.read((r[rs] + simm) & M, 4)
+        elif op == 0x3a: self.write((r[rs] + simm) & M, 4, self.cop2[rt])
         elif op == 0x20:
             v = self.read((r[rs] + simm) & M, 1); r[rt] = v - 256 if v & 0x80 else v
         elif op == 0x21:
