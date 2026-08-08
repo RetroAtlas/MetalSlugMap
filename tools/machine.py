@@ -43,6 +43,21 @@ GPUSTAT = 0x1F801814
 GPU_READY = 0x1C000000
 
 
+def _bios_b(cpu, fn, events):
+    """The kernel's event system, answered as if everything already happened.
+
+    Waiting on the disc or on a frame is how the game paces itself against
+    hardware that is not here, so an event that is always ready is what keeps it
+    moving. Nothing it waits for can fail in this machine.
+    """
+    if fn == 0x08:                                     # OpenEvent
+        events.append(cpu.r[4])
+        return 0xF1000000 + len(events)
+    if fn in (0x07, 0x09, 0x0a, 0x0b, 0x0c, 0x0d):     # Deliver/Close/Wait/Test/Enable
+        return 1
+    return 0
+
+
 def _bios_a(cpu, fn):
     r = cpu.r
     dst, src, n = r[4], r[5], r[6]
@@ -88,6 +103,7 @@ class Machine:
         self.loaded = []
         self.spawned = []
         self.kernel = {}        # (vector, fn) -> times called, so gaps are visible
+        self.events = []
         self.cpu.traps[CD_LOAD] = self._cd_load
         for addr in CD_STUBS:
             self.cpu.traps[addr] = self._cd_ok
@@ -101,7 +117,12 @@ class Machine:
         vector = cpu.pc_trap
         fn = cpu.r[9]
         self.kernel[(vector, fn)] = self.kernel.get((vector, fn), 0) + 1
-        cpu.r[2] = _bios_a(cpu, fn) if vector == 0xA0 else 0
+        if vector == 0xA0:
+            cpu.r[2] = _bios_a(cpu, fn)
+        elif vector == 0xB0:
+            cpu.r[2] = _bios_b(cpu, fn, self.events)
+        else:
+            cpu.r[2] = 0
 
     def _io_read(self, addr, size):
         return GPU_READY if (addr & 0x1FFFFFFF) == GPUSTAT else 0
