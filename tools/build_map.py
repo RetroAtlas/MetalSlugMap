@@ -20,7 +20,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from disc import Disc
 from png import write_png
-from extract_art import page as art_page
+from extract_art import page as art_page, palette_of
 from render import TILE, best_state, draw
 from section import load_order, pieces, stream
 from vram import tim_records
@@ -195,8 +195,10 @@ def sprites(disc, out):
         for name in names:
             data = disc.read_file(name + ".BIN")
             pages = []
+            palette = None
             for i, record in enumerate(tim_records(data)):
-                w, h, pixels = art_page(record)
+                palette = palette_of(record) or palette
+                w, h, pixels = art_page(record, palette)
                 rel = f"sprites/msx/{name.lower()}_{i:02d}.png"
                 write_png(out / rel, w, h, pixels, keep_alpha=True)
                 pages.append({"png": rel, "w": w, "h": h})

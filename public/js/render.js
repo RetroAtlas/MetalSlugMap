@@ -139,7 +139,7 @@ function outlines() {
     ctx.font = `${11 / S.cam.z}px -apple-system, "Segoe UI", sans-serif`;
     ctx.textBaseline = "top";
     for (const at of S.layout) {
-      const t = `${at.piece.tw}×${at.piece.th}`;
+      const t = at.piece.page ? `${at.piece.w}×${at.piece.h}` : `${at.piece.tw}×${at.piece.th}`;
       ctx.fillStyle = "rgba(10,11,14,.7)";
       const w = ctx.measureText(t).width + 6 / S.cam.z;
       ctx.fillRect(at.x + 2 / S.cam.z, at.y + 2 / S.cam.z, w, 14 / S.cam.z);

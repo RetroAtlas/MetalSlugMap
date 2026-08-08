@@ -29,14 +29,22 @@ def mission_files(disc):
                   if n.startswith("X") and n.endswith(".BIN") and n[1:-4].isdigit())
 
 
-def page(record):
-    """Unpack one record to (width, height, RGBA) under the palette it carries."""
+def palette_of(record):
+    clut = record["clut"]
+    if not clut:
+        return None
+    return [clut[4][i * 2] | (clut[4][i * 2 + 1] << 8) for i in range(clut[2])]
+
+
+def page(record, palette=None):
+    """Unpack one record to (width, height, RGBA).
+
+    Only some records carry a palette; the rest are uploaded against one a
+    previous record left in memory, so the caller passes the last one seen.
+    """
     blob, w, h = record["pixels"], record["w"], record["h"]
     per = {0: 4, 1: 2, 2: 1}[record["mode"]]
-    clut = record["clut"]
-    palette = []
-    if clut:
-        palette = [clut[4][i * 2] | (clut[4][i * 2 + 1] << 8) for i in range(clut[2])]
+    palette = palette_of(record) or palette or []
     out = bytearray(w * per * h * 4)
     for y in range(h):
         for x in range(w):
@@ -77,8 +85,10 @@ def main():
         data = disc.read_file(name)
         stem = name[:-4].lower()
         pages = tim_records(data)
+        palette = None
         for i, record in enumerate(pages):
-            w, h, pixels = page(record)
+            palette = palette_of(record) or palette
+            w, h, pixels = page(record, palette)
             path = out / f"{stem}_{i:02d}_{w}x{h}.png"
             write_png(path, w, h, pixels, keep_alpha=True)
         print(f"{name}: {len(pages)} texture page(s) -> {stem}_*.png")
