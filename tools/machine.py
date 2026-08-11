@@ -11,6 +11,11 @@ the executable, so the trap here reads the path out of memory, finds that file,
 and drops it at the load address the entry names. The game therefore tells us
 what to load and where, which is also the only way to know which overlay is
 resident in an arena several files share.
+
+Not every file is asked for by manifest entry, though: a stage names its own
+files by path and has them looked up first, so the lookup is answered from the
+disc image too. That is not a convenience — a lookup that fails is retried on
+the same file forever, so leaving it unanswered stalls the game outright.
 """
 import struct
 
@@ -19,6 +24,8 @@ from manifest import COUNT, TABLE, entries
 
 EXE = "SLUS_012.12"
 CD_LOAD = 0x8001db64        # takes a manifest entry, streams the file to its address
+CD_FIND = 0x8006f2c4        # looks a path up on the disc: where it is, and how big
+CD_STREAM = 0x80072504      # reads a named file, or the next piece of the last one
 ACTOR_NEW = 0x80014f24      # allocates an actor: flags, parent, required free slots
 CURRENT_ACTOR = 0x800c9a98
 FREE_LIST = 0x800c9a94
@@ -34,7 +41,8 @@ CD_STUBS = (0x80061cf8, 0x80071354, 0x800715c4)
 STAGE_START = 0x80013280    # sets a stage up; takes its index from PICK_STAGE
 PICK_STAGE = 0x800529b0     # trap this to choose one of the sub-stage table's entries
 FRAME_LOOP = 0x800152e8     # walks the actor lists and calls each handler
-FRAME_WAIT = 0x800706e8     # polls a byte only an interrupt would set
+CD_COMMAND = 0x800706e8     # two in to the library's command sender, which the
+                            # retry wrapper at 0x80071490 asks up to four times
 VSYNC = 0x8006e434          # returns the frame counter, which the game waits on
 DRAW_LIST = 0x8007d0ec      # walks the primitive list; drawing, so it can be skipped
 BSS, BSS_END = 0x800c9a50, 0x800fa6b0    # the range the start-up code clears
@@ -48,6 +56,22 @@ GPUSTAT = 0x1F801814
 # bits 26-28 are the "ready" flags the drawing code waits on; without them set
 # the game spins forever on a graphics chip that is never going to answer
 GPU_READY = 0x1C000000
+
+
+def _basename(path):
+    return path.split("\\")[-1].split(";")[0].upper()
+
+
+def _found_file(lba, size, name):
+    """A lookup's answer, laid out the way the disc library hands it back.
+
+    The position is what the drive is asked to seek to, so it is a running time
+    from the start of the lead-in rather than a sector number.
+    """
+    frames = lba + 150
+    bcd = lambda v: (v // 10) * 16 + v % 10
+    pos = bytes([bcd(frames // 4500), bcd(frames // 75 % 60), bcd(frames % 75), 0])
+    return pos + struct.pack("<I", size) + name.encode()[:15].ljust(16, b"\0")
 
 
 def _bios_b(cpu, fn, events):
@@ -108,11 +132,16 @@ class Machine:
         self.cpu.r[29] = self.cpu.r[30] = sp or 0x801FFFF0
         self.manifest = {i: e for i, e in enumerate(entries(exe))}
         self.loaded = []
+        self.searched = []
+        self.streamed = []
+        self.stream = None
         self.spawned = []
         self.kernel = {}        # (vector, fn) -> times called, so gaps are visible
         self.events = []
         self.frames = 0
         self.cpu.traps[CD_LOAD] = self._cd_load
+        self.cpu.traps[CD_FIND] = self._cd_find
+        self.cpu.traps[CD_STREAM] = self._cd_stream
         for addr in CD_STUBS:
             self.cpu.traps[addr] = self._cd_ok
         self.cpu.traps[VSYNC] = self._vsync
@@ -157,16 +186,46 @@ class Machine:
         self.kernel[("cd", cpu.pc_trap)] = self.kernel.get(("cd", cpu.pc_trap), 0) + 1
         cpu.r[2] = 1
 
+    def _cd_find(self, cpu):
+        name = _basename(cpu.cstring(cpu.r[5], 64))
+        found = self.disc.files.get(name)
+        if found:
+            cpu.load(cpu.r[4], _found_file(*found, name))
+        self.searched.append((name, bool(found)))
+        cpu.r[2] = cpu.r[4] if found else 0
+
+    def _cd_stream(self, cpu):
+        """Hand over a file the library streams rather than loads outright.
+
+        A name opens a file; no name asks for the next piece of the one already
+        open, so the position has to be kept between calls. The drive works in
+        whole sectors and the caller knows it, asking for what it wants and
+        being given the sector it lands in.
+        """
+        name, dest, want = cpu.r[4], cpu.r[5], cpu.r[6]
+        if name:
+            self.stream = [_basename(cpu.cstring(name, 64)), 0]
+        found = self.disc.files.get(self.stream[0]) if self.stream else None
+        if not found:
+            cpu.r[2] = 0
+            return
+        lba, size = found
+        left = size - self.stream[1]
+        read = min(want, left) if want else left
+        sectors = (read + 2047) // 2048
+        cpu.load(dest, self.disc.read(lba + self.stream[1] // 2048, sectors * 2048))
+        self.streamed.append((self.stream[0], dest, read))
+        self.stream[1] += sectors * 2048
+        cpu.r[2] = read
+
     def _cd_load(self, cpu):
         entry = cpu.r[4]
-        path = cpu.cstring(cpu.read(entry, 4), 64)
-        name = path.split("\\")[-1].split(";")[0]
+        name = _basename(cpu.cstring(cpu.read(entry, 4), 64))
         dest = cpu.read(entry + 4, 4)
-        if name in self.disc.files:
-            lba, size = self.disc.files[name]
+        found = self.disc.files.get(name)
+        if found:
             cpu.load(dest, self.disc.read_file(name))
-            cpu.write(entry + 8, 4, lba)
-            cpu.write(entry + 12, 4, size)
+            cpu.load(entry + 8, _found_file(*found, name)[:8])
             self.loaded.append((name, dest))
         cpu.r[2] = 1        # non-zero tells the caller the load finished
 
@@ -204,14 +263,14 @@ class Machine:
 
         `main` has to run for its init — it installs callbacks the frame code
         calls straight through — but not for its loop, so the loop is answered
-        instead of entered. The same goes for the frame wait, which polls a byte
-        that only an interrupt would ever set.
+        instead of entered. The same goes for the library's command sender, which
+        answers for a drive that is not here.
         """
         cpu = self.cpu
         self.boot()
         done = lambda c: c.r.__setitem__(2, 0)
         cpu.traps[FRAME_LOOP] = done
-        cpu.traps[FRAME_WAIT] = done
+        cpu.traps[CD_COMMAND] = done
         cpu.call(MAIN)
         del cpu.traps[FRAME_LOOP]
         cpu.traps[PICK_STAGE] = lambda c: c.r.__setitem__(2, index)
