@@ -35,6 +35,8 @@ STAGE_START = 0x80013280    # sets a stage up; takes its index from PICK_STAGE
 PICK_STAGE = 0x800529b0     # trap this to choose one of the sub-stage table's entries
 FRAME_LOOP = 0x800152e8     # walks the actor lists and calls each handler
 FRAME_WAIT = 0x800706e8     # polls a byte only an interrupt would set
+VSYNC = 0x8006e434          # returns the frame counter, which the game waits on
+DRAW_LIST = 0x8007d0ec      # walks the primitive list; drawing, so it can be skipped
 BSS, BSS_END = 0x800c9a50, 0x800fa6b0    # the range the start-up code clears
 
 # The game reaches the kernel the way every PlayStation title does, by jumping to
@@ -109,9 +111,12 @@ class Machine:
         self.spawned = []
         self.kernel = {}        # (vector, fn) -> times called, so gaps are visible
         self.events = []
+        self.frames = 0
         self.cpu.traps[CD_LOAD] = self._cd_load
         for addr in CD_STUBS:
             self.cpu.traps[addr] = self._cd_ok
+        self.cpu.traps[VSYNC] = self._vsync
+        self.cpu.traps[DRAW_LIST] = self._nothing
         self.cpu.on_syscall = self._syscall
         self.cpu.io_read = self._io_read
         for vector in BIOS_VECTORS:
@@ -128,6 +133,16 @@ class Machine:
             cpu.r[2] = _bios_b(cpu, fn, self.events)
         else:
             cpu.r[2] = 0
+
+    def _vsync(self, cpu):
+        # The game paces itself by waiting for this count to move on. Nothing
+        # advances it here, so time has to come from somewhere: one call, one
+        # frame, which is what a console with no interrupts can honestly offer.
+        self.frames += 1
+        cpu.r[2] = self.frames
+
+    def _nothing(self, cpu):
+        cpu.r[2] = 0
 
     def _io_read(self, addr, size):
         return GPU_READY if (addr & 0x1FFFFFFF) == GPUSTAT else 0
