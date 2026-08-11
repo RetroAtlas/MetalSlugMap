@@ -36,6 +36,7 @@ class Cpu:
         self.hi = self.lo = 0
         self.pc = 0
         self.traps = {}        # address -> fn(cpu); a trapped call returns to $ra
+        self.watch = {}        # address -> fn(cpu); runs, then the code carries on
         self.steps = 0
         self.limit = 20_000_000
         self.trace = None      # set to a deque to keep the last addresses executed
@@ -93,10 +94,14 @@ class Cpu:
     def run(self, stop):
         pc = self.pc
         delay = None            # (target,) queued by a branch
+        watch = self.watch or None
         while True:
             if pc == stop:
                 self.pc = pc
                 return
+            if watch is not None and pc in watch:
+                self.pc = pc
+                watch[pc](self)
             fn = self.traps.get(pc)
             if fn is not None:
                 self.pc_trap = pc

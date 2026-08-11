@@ -19,7 +19,7 @@ the same file forever, so leaving it unanswered stalls the game outright.
 """
 import struct
 
-from cpu import Cpu
+from cpu import Cpu, Halt
 from manifest import COUNT, TABLE, entries
 
 EXE = "SLUS_012.12"
@@ -38,9 +38,12 @@ MAIN = 0x8001255c
 # file requests it really cares about arrive at CD_LOAD, which is served in full.
 CD_STUBS = (0x80061cf8, 0x80071354, 0x800715c4)
 
-STAGE_START = 0x80013280    # sets a stage up; takes its index from PICK_STAGE
-PICK_STAGE = 0x800529b0     # trap this to choose one of the sub-stage table's entries
+STAGE_START = 0x80013280    # the attract demo: picks a sub-stage at random and runs it
+RANDOM = 0x800529b0         # the game's own random number, asked for a number under $a0
+DEMO_PICK = 0x800132c0      # where the demo's own call to it comes back, so it can be
+                            # answered without touching every other roll in the game
 FRAME_LOOP = 0x800152e8     # walks the actor lists and calls each handler
+NEXT_ACTOR = 0x80015328     # the top of that walk, and the only safe place to stop
 CD_COMMAND = 0x800706e8     # two in to the library's command sender, which the
                             # retry wrapper at 0x80071490 asks up to four times
 VSYNC = 0x8006e434          # returns the frame counter, which the game waits on
@@ -259,12 +262,21 @@ class Machine:
         return MAIN
 
     def start_stage(self, index):
-        """Run the game's own initialisation, then start one sub-stage.
+        """Run the game until it starts a stage by itself, and say which one.
+
+        There is a way into a stage that needs no player: the title screen waits
+        a while, then picks one of the nine sub-stages and plays it as a demo.
+        Choosing that number is the whole of the steering — the rest is the
+        game's own path from boot to stage, and taking it matters because the
+        opening draws its screens out of the arena a stage overlay loads into,
+        so a stage started before the opening is over runs actors whose code the
+        overlay has since written over.
 
         `main` has to run for its init — it installs callbacks the frame code
         calls straight through — but not for its loop, so the loop is answered
-        instead of entered. The same goes for the library's command sender, which
-        answers for a drive that is not here.
+        instead of entered, and entered here instead. Leaving that loop is only
+        safe between actors: a handler stopped part-way leaves its own work
+        half-done.
         """
         cpu = self.cpu
         self.boot()
@@ -273,8 +285,32 @@ class Machine:
         cpu.traps[CD_COMMAND] = done
         cpu.call(MAIN)
         del cpu.traps[FRAME_LOOP]
-        cpu.traps[PICK_STAGE] = lambda c: c.r.__setitem__(2, index)
-        cpu.call(STAGE_START)
+
+        def choose(c):
+            if c.r[31] == DEMO_PICK:
+                c.r[2] = index
+                return
+            ra = c.r[31]
+            del c.traps[RANDOM]
+            c.r[2] = c.call(RANDOM, (c.r[4],), ra=0xDEAD3000)
+            c.traps[RANDOM] = choose
+            c.r[31] = ra
+
+        def between_actors(c):
+            if started:
+                raise Halt("the stage is running")
+
+        started = []
+        cpu.traps[RANDOM] = choose
+        cpu.watch[STAGE_START] = lambda c: started.append(c.steps)
+        cpu.watch[NEXT_ACTOR] = between_actors
+        try:
+            cpu.call(FRAME_LOOP)
+        except Halt:
+            if not started:
+                raise
+        finally:
+            del cpu.watch[STAGE_START], cpu.watch[NEXT_ACTOR]
         return cpu.read(0x800edb30, 2), cpu.read(0x800edb5c, 2)
 
     def index_of(self, name):
