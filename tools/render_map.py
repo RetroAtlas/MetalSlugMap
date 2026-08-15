@@ -7,7 +7,7 @@ when that piece was on screen.
 
     python3 tools/render_map.py --disc "Metal Slug X.bin" --section X1_00.BIN
 
---disc defaults to $METAL_SLUG_DISC.
+--disc defaults to $METAL_SLUG_DISC_X.
 """
 import argparse
 import os
@@ -24,13 +24,13 @@ from section import load_order, pieces, stream
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--disc", default=os.environ.get("METAL_SLUG_DISC"),
-                    help="raw PS1 disc image; defaults to $METAL_SLUG_DISC")
+    ap.add_argument("--disc", default=os.environ.get("METAL_SLUG_DISC_X"),
+                    help="raw PS1 disc image; defaults to $METAL_SLUG_DISC_X")
     ap.add_argument("--section", default="X1_00.BIN", help="section holding the tilemaps")
     ap.add_argument("--out", default="out", help="output directory")
     args = ap.parse_args()
     if not args.disc:
-        ap.error("no disc image: pass --disc or set $METAL_SLUG_DISC")
+        ap.error("no disc image: pass --disc or set $METAL_SLUG_DISC_X")
 
     disc = Disc(args.disc)
     name = args.section.upper()

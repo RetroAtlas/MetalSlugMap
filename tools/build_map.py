@@ -7,7 +7,7 @@ stage, and writes the PNGs plus `map_data_msx.json`.
 
     python3 tools/build_map.py --disc "Metal Slug X.bin"
 
---disc defaults to $METAL_SLUG_DISC. Output goes to public/ by default, which
+--disc defaults to $METAL_SLUG_DISC_X. Output goes to public/ by default, which
 is what the viewer serves.
 """
 import argparse
@@ -210,13 +210,13 @@ def sprites(disc, out):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--disc", default=os.environ.get("METAL_SLUG_DISC"),
-                    help="raw PS1 disc image; defaults to $METAL_SLUG_DISC")
+    ap.add_argument("--disc", default=os.environ.get("METAL_SLUG_DISC_X"),
+                    help="raw PS1 disc image; defaults to $METAL_SLUG_DISC_X")
     ap.add_argument("--out", default="public", help="output directory")
     ap.add_argument("--missions", default="", help="comma list to limit (e.g. X1,X3)")
     args = ap.parse_args()
     if not args.disc:
-        ap.error("no disc image: pass --disc or set $METAL_SLUG_DISC")
+        ap.error("no disc image: pass --disc or set $METAL_SLUG_DISC_X")
 
     disc = Disc(args.disc)
     only = {m.strip().upper() for m in args.missions.split(",") if m.strip()}

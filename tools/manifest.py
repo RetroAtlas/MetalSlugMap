@@ -8,7 +8,7 @@
 runtime once the file is found on the disc, so they read zero here. The load
 address is the useful column: it says where a file ends up, which is what makes
 an overlay disassemblable (`tools/mips.py --base`) and what groups files that
-share a slot. --disc defaults to $METAL_SLUG_DISC.
+share a slot. --disc defaults to $METAL_SLUG_DISC_X.
 """
 import argparse
 import os
@@ -62,13 +62,13 @@ def code_score(blob, base):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--disc", default=os.environ.get("METAL_SLUG_DISC"),
-                    help="raw PS1 disc image; defaults to $METAL_SLUG_DISC")
+    ap.add_argument("--disc", default=os.environ.get("METAL_SLUG_DISC_X"),
+                    help="raw PS1 disc image; defaults to $METAL_SLUG_DISC_X")
     ap.add_argument("--code", action="store_true",
                     help="also test each file for MIPS code at its load address")
     args = ap.parse_args()
     if not args.disc:
-        ap.error("no disc image: pass --disc or set $METAL_SLUG_DISC")
+        ap.error("no disc image: pass --disc or set $METAL_SLUG_DISC_X")
 
     disc = Disc(args.disc)
     exe = disc.read_file(EXE)

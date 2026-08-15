@@ -6,7 +6,7 @@
 
 The executable is a PS-EXE whose text sits at 0x80010000; an overlay carries no
 header, so its load address is recovered from where its own `jal`s point and
-passed with --base. --disc defaults to $METAL_SLUG_DISC.
+passed with --base. --disc defaults to $METAL_SLUG_DISC_X.
 """
 import argparse
 import os
@@ -110,8 +110,8 @@ def main():
     from disc import Disc
 
     ap = argparse.ArgumentParser()
-    ap.add_argument("--disc", default=os.environ.get("METAL_SLUG_DISC"),
-                    help="raw PS1 disc image; defaults to $METAL_SLUG_DISC")
+    ap.add_argument("--disc", default=os.environ.get("METAL_SLUG_DISC_X"),
+                    help="raw PS1 disc image; defaults to $METAL_SLUG_DISC_X")
     ap.add_argument("--file", default=EXE, help="file on the disc to disassemble")
     ap.add_argument("--base", type=lambda v: int(v, 0), default=None,
                     help="load address of the file (default: the executable's)")
@@ -119,7 +119,7 @@ def main():
     ap.add_argument("--count", type=int, default=32, help="instructions to print")
     args = ap.parse_args()
     if not args.disc:
-        ap.error("no disc image: pass --disc or set $METAL_SLUG_DISC")
+        ap.error("no disc image: pass --disc or set $METAL_SLUG_DISC_X")
 
     disc = Disc(args.disc)
     name = args.file.upper()

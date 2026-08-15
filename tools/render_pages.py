@@ -6,7 +6,7 @@ every 16x16 tile is drawn through the palette the game assigns it.
 
     python3 tools/render_pages.py --disc "Metal Slug X.bin" --section X1_00.BIN
 
---disc defaults to $METAL_SLUG_DISC. VRAM is time-dependent during play: extra
+--disc defaults to $METAL_SLUG_DISC_X. VRAM is time-dependent during play: extra
 files can be layered with --art, but loading everything at once overwrites
 pages the section still needs.
 """
@@ -26,15 +26,15 @@ from vram import Vram
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--disc", default=os.environ.get("METAL_SLUG_DISC"),
-                    help="raw PS1 disc image; defaults to $METAL_SLUG_DISC")
+    ap.add_argument("--disc", default=os.environ.get("METAL_SLUG_DISC_X"),
+                    help="raw PS1 disc image; defaults to $METAL_SLUG_DISC_X")
     ap.add_argument("--section", default="X1_00.BIN", help="section file holding a tile list")
     ap.add_argument("--art", nargs="*", default=None,
                     help="art files to load into VRAM (default: the mission's X<n>.BIN)")
     ap.add_argument("--out", default="out", help="output directory")
     args = ap.parse_args()
     if not args.disc:
-        ap.error("no disc image: pass --disc or set $METAL_SLUG_DISC")
+        ap.error("no disc image: pass --disc or set $METAL_SLUG_DISC_X")
 
     disc = Disc(args.disc)
     section = args.section.upper()

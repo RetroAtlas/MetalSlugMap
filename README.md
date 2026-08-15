@@ -37,7 +37,7 @@ That currently yields **219 stage pieces and 16 animated objects across all 12 m
 
 The build also lifts the **sprite banks** — the four playable characters, their mummified and fat forms, and the vehicles — which browse under `SPR` alongside the missions. These are whole sheets of every animation frame, not individual cut-outs: the assembly data that would separate the frames lives in `\PL\PAT*.BIN` and is not decoded.
 
-`--disc` can be omitted if `$METAL_SLUG_DISC` points at the image. `tools/render_map.py` writes single sections to `out/` (git-ignored) when you want the PNGs on their own.
+`--disc` can be omitted if `$METAL_SLUG_DISC_X` points at the image. `tools/render_map.py` writes single sections to `out/` (git-ignored) when you want the PNGs on their own.
 
 ## Roadmap
 

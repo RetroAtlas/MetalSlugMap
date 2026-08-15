@@ -8,7 +8,7 @@ under `\\PL` and `\\STD` too.
 Usage:
     python3 tools/extract_art.py --disc "Metal Slug X.bin" [--file X1.BIN] [--out out]
 
---disc defaults to $METAL_SLUG_DISC. With no --file, every X*.BIN mission file
+--disc defaults to $METAL_SLUG_DISC_X. With no --file, every X*.BIN mission file
 is scanned. Each page is written under the first palette its record carries;
 tiles pick their own palette out of that bank, which is what the tilemap tools
 resolve.
@@ -63,14 +63,14 @@ def page(record, palette=None):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--disc", default=os.environ.get("METAL_SLUG_DISC"),
+    ap.add_argument("--disc", default=os.environ.get("METAL_SLUG_DISC_X"),
                     help="raw PS1 disc image (.bin, 2352-byte sectors); "
-                         "defaults to $METAL_SLUG_DISC")
+                         "defaults to $METAL_SLUG_DISC_X")
     ap.add_argument("--file", help="a single mission file (e.g. X1.BIN); default: all")
     ap.add_argument("--out", default="out", help="output directory (default: out/)")
     args = ap.parse_args()
     if not args.disc:
-        ap.error("no disc image: pass --disc or set $METAL_SLUG_DISC")
+        ap.error("no disc image: pass --disc or set $METAL_SLUG_DISC_X")
 
     disc = Disc(args.disc)
     names = [args.file.upper()] if args.file else mission_files(disc)
