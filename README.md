@@ -80,4 +80,4 @@ Every game-specific name carries its game prefix from day one (`msx` for Metal S
 
 ## Licensing
 
-Copyright (C) 2026 mariobob, under GPL-2.0 (see [LICENSE](LICENSE)), matching the sibling project. The tooling ships no game code; extracted imagery is © SNK and is intended for research and preservation.
+Copyright (C) 2026 mariobob, under GPL-2.0 (see [LICENSE](LICENSE)). The licence covers the code here and nothing else: the tooling ships no game code, and the extracted imagery is © SNK, presented for research and preservation. A rights holder who wants something taken down can write to hello@retroatlas.org.
