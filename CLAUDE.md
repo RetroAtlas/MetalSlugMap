@@ -74,3 +74,4 @@ Guidance for AI agents working in this repo. Read [README.md](README.md) first f
 - No game owns unsuffixed defaults: everything game-specific carries its prefix (`msx`, later `ms1`/`ms2`) in files, identifiers and paths. Do not reintroduce unsuffixed names for Metal Slug X just because it came first.
 - Tooling is dependency-free Python 3 (standard library only); `tools/png.py` is a minimal writer rather than a Pillow dependency.
 - The Pages deploy is a job in [.github/workflows/ci.yml](.github/workflows/ci.yml), copied from OddworldMap's with its action versions. A check belongs in the same file and in the deploy's `needs`; one in a workflow of its own would gate nothing.
+- The contact address is never written out under `public/`: the About joins it from its parts, out of reach of scrapers that read the source.

@@ -31,6 +31,8 @@ export function buildDialogs() {
 
   const s = stats(S.data);
   $("aboutBody").innerHTML = `
+    <p>An unofficial fan project, unaffiliated with the rights holders in
+    <i>Metal Slug X</i>.</p>
     <p>Every stage piece here was read straight off a PlayStation disc of
     <b>Metal Slug X</b> (NTSC-U, SLUS-012.12) — no emulator, no screenshots.
     The tooling walks the disc's ISO9660 sectors, decodes the PS1 TIM artwork,
@@ -55,7 +57,8 @@ export function buildDialogs() {
     placement into per-stage code rather than storing it, so POWs, weapons and
     enemies cannot be lifted the way this map's artwork was.</p>
     <p>Sister project to <a href="https://oddworldmap.com/" target="_blank"
-    rel="noopener">Oddworld Map</a>.</p>`;
+    rel="noopener">Oddworld Map</a>.</p>
+    <p><a href="mailto:${["hello", "retroatlas.org"].join("@")}">Get in touch</a></p>`;
 
   for (const [btn, id] of [["shortcutsClose", "shortcutsOverlay"], ["aboutClose", "aboutOverlay"]]) {
     $(btn).onclick = () => close(id);
