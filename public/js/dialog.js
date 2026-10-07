@@ -55,7 +55,7 @@ export function buildDialogs() {
     marked break where they do not. A break is drawn, not hidden.</p>
     <p>There are no spawn tables to add later. Metal Slug X compiles object
     placement into per-stage code rather than storing it, so POWs, weapons and
-    enemies cannot be lifted the way this map's artwork was.</p>
+    enemies cannot be extracted the way this map's artwork was.</p>
     <p>Sister project to <a href="https://oddworldmap.com/" target="_blank"
     rel="noopener">Oddworld Map</a>.</p>
     <p><a href="mailto:${["hello", "retroatlas.org"].join("@")}">Get in touch</a></p>`;
